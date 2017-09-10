@@ -2,15 +2,19 @@ module.exports = {
   options: {
     fileEnding: 'html',
     beforeEach: {
-      // components: ['head']
+      components: ['_head']
     },
     afterEach: {
-      // components: ['footer']
+      components: ['_foot']
     }
   },
   pages: [
     {
-      name: 'index',
+      name: 'qwe',
+      components: ['image']
+    },
+    {
+      name: '123123',
       components: ['image']
     }
   ]
