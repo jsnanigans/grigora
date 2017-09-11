@@ -33,6 +33,7 @@ function nemek(options) {
     let append = options.afterEach.components || []
 
     let components = prepend.concat(pageOpts.components).concat(append)
+    // let components = pageOpts.components
 
     let combinedHTML = ''
     
@@ -40,9 +41,10 @@ function nemek(options) {
       // let mod = require()
       let srcFile = path.join(__dirname, '../src/components/') + comp + '/' + comp + '.ejs';
 
-      if (this.relatedFiles.indexOf(srcFile) === -1) {
+      if (this.relatedFiles.indexOf(srcFile) === -1 && srcFile !== '' && srcFile) {
         this.relatedFiles.push(srcFile)
-        this.compilation.fileDependencies.push(srcFile)
+        // this.compilation.fileDependencies.push(srcFile)
+        console.log(srcFile)
       }
 
       this.readModuleTemplate(srcFile, function (err, body) {
@@ -54,6 +56,12 @@ function nemek(options) {
         }
       });
       // console.log(mod)
+    })
+  }
+
+  this.watchFiles = _ => {
+    this.relatedFiles.forEach(file => {
+      this.compilation.fileDependencies.push(file)
     })
   }
 
@@ -96,7 +104,7 @@ nemek.prototype.apply = function (compiler) {
 
     let directory = path.join(__dirname, '../pages')
     fs.readdir(directory, (err, files) => {
-      if (err) throw error;
+      if (err) throw err;
     
       for (const file of files) {
         fs.unlink(path.join(directory, file), err => {
@@ -106,15 +114,20 @@ nemek.prototype.apply = function (compiler) {
 
 
       var changedFiles = Object.keys(compilation.fileTimestamps).filter(function (watchfile) {
-        return (this.prevTimestamps[watchfile] || this.startTime) < (compilation.fileTimestamps[watchfile] || Infinity);
+        return watchfile.indexOf('image') !== -1
+        // return (this.prevTimestamps[watchfile] || this.startTime) < (compilation.fileTimestamps[watchfile] || Infinity);
       }.bind(this));
+
+      console.log(changedFiles)
   
       changedFiles.forEach(file => {
-        console.log(file)
+        // console.log(file, this.relatedFiles.indexOf(file))
+        // console.log(this.compilation.fileDependencies)
         if (file === this.configFile) {
           this.loadConfig()
         }
         if (file === this.configFile || this.relatedFiles.indexOf(file) !== -1) {
+        //   this.generatePages()
           this.generatePages()
         }
       })
@@ -126,6 +139,7 @@ nemek.prototype.apply = function (compiler) {
       this.generatePages()
   
       this.compilation.fileDependencies.push(path.join(__dirname, '../src/routes.js'))
+      this.watchFiles()
   
       callback();
     });
