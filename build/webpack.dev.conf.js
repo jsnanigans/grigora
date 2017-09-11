@@ -30,11 +30,6 @@ module.exports = merge(baseWebpackConfig, {
       config: path.join(__dirname, '../src/routes.js')
     }),
     // https://github.com/ampedandwired/html-webpack-plugin
-    new HtmlWebpackPlugin({
-      filename: 'index.html',
-      template: 'index.html',
-      inject: true
-    }),
     new FriendlyErrorsPlugin()
   ]
 })

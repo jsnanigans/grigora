@@ -129,6 +129,12 @@ nemek.prototype.apply = function (compiler) {
         if (file === this.configFile || this.relatedFiles.indexOf(file) !== -1) {
         //   this.generatePages()
           this.generatePages()
+
+          if (compilation.hotMiddleware) {
+            setTimeout(_ => {
+              compilation.hotMiddleware.publish({ action: 'reload' })
+            })
+          }
         }
       })
       

@@ -10,7 +10,7 @@ module.exports = {
   },
   pages: [
     {
-      name: 'demo',
+      name: 'index',
       components: ['image']
     }
   ]
