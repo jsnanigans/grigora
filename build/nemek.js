@@ -2,6 +2,7 @@ const fs = require('fs')
 const ejs = require('ejs')
 const path = require('path')
 
+const componentsPath = '../src/components/' 
 
 function nemek(options) {
   // this.options = options
@@ -33,26 +34,26 @@ function nemek(options) {
     let append = options.afterEach.components || []
 
     let components = prepend.concat(pageOpts.components).concat(append)
-    // let components = pageOpts.components
 
     let combinedHTML = ''
     
     components.forEach((comp, ci) => {
-      // let mod = require()
-      let srcFile = path.join(__dirname, '../src/components/') + comp + '/' + comp + '.ejs';
+      let srcFile = path.join(__dirname, componentsPath) + comp + '/' + comp + '.ejs';
+      let seedFile = path.join(__dirname, componentsPath) + comp + '/seeds.js'
+
+      let seedData = fs.existsSync(seedFile) ? require.resolve(seedFile) : false 
+      console.log(seedData)
 
       if (this.relatedFiles.indexOf(srcFile) === -1 && srcFile !== '' && srcFile) {
         this.relatedFiles.push(srcFile)
-        // this.compilation.fileDependencies.push(srcFile)
-        console.log(srcFile)
       }
 
+
       this.readModuleTemplate(srcFile, function (err, body) {
-        let rendered = ejs.render(body, {}, {});
+        let rendered = ejs.render(body, seedData, {});
         combinedHTML += rendered + '\n';
         if (ci === components.length - 1) {
-          fs.writeFile(path.join(__dirname, '../pages/') + name + '.' + (options.fileEnding || '.html'), combinedHTML, 'utf8', _ => {
-          });
+          fs.writeFile(path.join(__dirname, '../pages/') + name + '.' + (options.fileEnding || '.html'), combinedHTML, 'utf8', _ => {});
         }
       });
       // console.log(mod)
@@ -83,21 +84,6 @@ function nemek(options) {
 
 
 nemek.prototype.apply = function (compiler) {
-  // console.log(compiler.options.output.path)
-  // compiler.plugin('after-compile', function(compilation, callback) {
-    
-  //   // let related = this.relatedFiles || []
-  //   // related.forEach(file => {
-  //   //   if (compilation.fileDependencies.indexOf(file) === -1) {
-  //   //     compilation.fileDependencies.push(file)
-  //   //     console.log(add)
-  //   //   }
-  //   // })
-
-  //   // compilation.fileDependencies.push("./app/worksheet.html");
-  //   callback();
-  // });
-
 
   this.distPath = compiler.options.output.path
   compiler.plugin('emit', function (compilation, callback) {
@@ -114,20 +100,16 @@ nemek.prototype.apply = function (compiler) {
 
 
       var changedFiles = Object.keys(compilation.fileTimestamps).filter(function (watchfile) {
-        return watchfile.indexOf('image') !== -1
-        // return (this.prevTimestamps[watchfile] || this.startTime) < (compilation.fileTimestamps[watchfile] || Infinity);
+        return (this.prevTimestamps[watchfile] || this.startTime) < (compilation.fileTimestamps[watchfile] || Infinity);
       }.bind(this));
 
       console.log(changedFiles)
   
       changedFiles.forEach(file => {
-        // console.log(file, this.relatedFiles.indexOf(file))
-        // console.log(this.compilation.fileDependencies)
         if (file === this.configFile) {
           this.loadConfig()
         }
         if (file === this.configFile || this.relatedFiles.indexOf(file) !== -1) {
-        //   this.generatePages()
           this.generatePages()
 
           if (compilation.hotMiddleware) {
@@ -154,24 +136,3 @@ nemek.prototype.apply = function (compiler) {
 };
 
 module.exports = nemek;
-
-
-// 
-// function MyPlugin() {
-//   this.startTime = Date.now();
-//   this.prevTimestamps = {};
-// }
-
-// MyPlugin.prototype.apply = function (compiler) {
-//   compiler.plugin('emit', function (compilation, callback) {
-
-//     var changedFiles = Object.keys(compilation.fileTimestamps).filter(function (watchfile) {
-//       return (this.prevTimestamps[watchfile] || this.startTime) < (compilation.fileTimestamps[watchfile] || Infinity);
-//     }.bind(this));
-
-//     this.prevTimestamps = compilation.fileTimestamps;
-//     callback();
-//   }.bind(this));
-// };
-
-// module.exports = MyPlugin;
