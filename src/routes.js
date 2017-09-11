@@ -10,11 +10,7 @@ module.exports = {
   },
   pages: [
     {
-      name: 'qwe',
-      components: ['image']
-    },
-    {
-      name: '123123',
+      name: 'demo',
       components: ['image']
     }
   ]
