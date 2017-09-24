@@ -41,35 +41,51 @@ function nemek(options) {
     let components = prepend.concat(pageOpts.components).concat(append)
 
     let combinedHTML = ''
-    
-    components.forEach((comp, ci) => {
-      let srcFile = path.join(__dirname, componentsPath) + comp + '/' + comp + '.ejs';
-      let seedFile = path.join(__dirname, componentsPath) + comp + '/seeds.js'
 
-      let seedData = fs.existsSync(seedFile) ? requireUncached(seedFile) : false 
-
-      if (this.relatedFiles.indexOf(srcFile) === -1 && srcFile !== '' && srcFile) {
-        this.relatedFiles.push(srcFile)
-      }
-      if (fs.existsSync(seedFile) && this.relatedFiles.indexOf(seedFile) === -1 && seedFile !== '' && seedFile) {
-        this.relatedFiles.push(seedFile)
+    let componentsObjects = components.map(comp => {
+      let rt = {
+        name: comp,
+        srcFile: path.join(__dirname, componentsPath) + comp + '/' + comp + '.ejs',
+        seedFile: path.join(__dirname, componentsPath) + comp + '/seeds.js',
       }
 
-      this.readModuleTemplate(srcFile, function (err, body) {
+      rt.seedData = fs.existsSync(rt.seedFile) ? requireUncached(rt.seedFile) : false
+
+      if (this.relatedFiles.indexOf(rt.srcFile) === -1 && rt.srcFile !== '' && rt.srcFile) {
+        this.relatedFiles.push(rt.srcFile)
+      }
+      if (fs.existsSync(rt.seedFile) && this.relatedFiles.indexOf(rt.seedFile) === -1 && rt.seedFile !== '' && rt.seedFile) {
+        this.relatedFiles.push(rt.seedFile)
+      }
+
+      return rt
+    })
+
+    let renderComponent = (ind) => {
+      let comp = componentsObjects[ind]
+
+
+      this.readModuleTemplate(comp.srcFile, function (err, body) {
         let rendered = ''
         try {
-          rendered = ejs.render(body, seedData)
+          rendered = ejs.render(body, comp.seedData)
         } 
         catch (e) {
           console.log(e)
         }
+        
+        combinedHTML += rendered + '\n'
 
-        combinedHTML += rendered + '\n';
-        if (ci === components.length - 1) {
+        if (componentsObjects[ind + 1]) {
+          renderComponent(ind + 1)
+        } else {
           fs.writeFile(path.join(__dirname, '../pages/') + name + '.' + (options.fileEnding || '.html'), combinedHTML, 'utf8', _ => {});
         }
+
       });
-    })
+    }
+    
+    renderComponent(0)
   }
 
   this.watchFiles = _ => {
