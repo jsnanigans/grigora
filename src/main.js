@@ -1,3 +1,2 @@
-// require('./routes')
-
-console.log('APP')
+require('@/components/image')
+require('./test.scss')

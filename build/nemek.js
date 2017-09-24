@@ -91,7 +91,6 @@ function nemek(options) {
   }
 }
 
-let initial = true
 nemek.prototype.apply = function (compiler) {
 
   this.distPath = compiler.options.output.path
@@ -133,12 +132,6 @@ nemek.prototype.apply = function (compiler) {
   
       this.loadConfig()
       this.generatePages()
-      if (initial) {
-        setTimeout(_ => {
-          this.generatePages()
-        })
-        initial = false
-      }
   
       this.compilation.fileDependencies.push(path.join(__dirname, '../src/routes.js'))
       this.watchFiles()
