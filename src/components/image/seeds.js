@@ -1,3 +1,3 @@
-export default {
-    images: 10
+module.exports = {
+  things: ['Hi', 'Val', 'Paris']
 }

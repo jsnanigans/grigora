@@ -4,6 +4,11 @@ const path = require('path')
 
 const componentsPath = '../src/components/' 
 
+function requireUncached(module){
+  delete require.cache[module]
+  return require(module)
+}
+
 function nemek(options) {
   // this.options = options
   this.configFile = options.config || false
@@ -21,7 +26,7 @@ function nemek(options) {
 
   this.loadConfig = _ => {
     if (this.configFile) {
-      this.config = (eval(fs.readFileSync(this.configFile.replace('module.exports =', 'return'))+''));
+      this.config = requireUncached(this.configFile)
     }
   }
 
@@ -41,22 +46,29 @@ function nemek(options) {
       let srcFile = path.join(__dirname, componentsPath) + comp + '/' + comp + '.ejs';
       let seedFile = path.join(__dirname, componentsPath) + comp + '/seeds.js'
 
-      let seedData = fs.existsSync(seedFile) ? require.resolve(seedFile) : false 
-      console.log(seedData)
+      let seedData = fs.existsSync(seedFile) ? requireUncached(seedFile) : false 
 
       if (this.relatedFiles.indexOf(srcFile) === -1 && srcFile !== '' && srcFile) {
         this.relatedFiles.push(srcFile)
       }
-
+      if (fs.existsSync(seedFile) && this.relatedFiles.indexOf(seedFile) === -1 && seedFile !== '' && seedFile) {
+        this.relatedFiles.push(seedFile)
+      }
 
       this.readModuleTemplate(srcFile, function (err, body) {
-        let rendered = ejs.render(body, seedData, {});
+        let rendered = ''
+        try {
+          rendered = ejs.render(body, seedData)
+        } 
+        catch (e) {
+          console.log(e)
+        }
+
         combinedHTML += rendered + '\n';
         if (ci === components.length - 1) {
           fs.writeFile(path.join(__dirname, '../pages/') + name + '.' + (options.fileEnding || '.html'), combinedHTML, 'utf8', _ => {});
         }
       });
-      // console.log(mod)
     })
   }
 
@@ -73,16 +85,13 @@ function nemek(options) {
     const options = conf.options || {}
     const pages = conf.pages || []
 
-    // const beforeEach = options.beforeEach
-    // const afterEach = options.afterEach
-
     pages.forEach(page => {
       this.generateSinglePage(page, options)
     })
   }
 }
 
-
+let initial = true
 nemek.prototype.apply = function (compiler) {
 
   this.distPath = compiler.options.output.path
@@ -103,7 +112,6 @@ nemek.prototype.apply = function (compiler) {
         return (this.prevTimestamps[watchfile] || this.startTime) < (compilation.fileTimestamps[watchfile] || Infinity);
       }.bind(this));
 
-      console.log(changedFiles)
   
       changedFiles.forEach(file => {
         if (file === this.configFile) {
@@ -125,6 +133,12 @@ nemek.prototype.apply = function (compiler) {
   
       this.loadConfig()
       this.generatePages()
+      if (initial) {
+        setTimeout(_ => {
+          this.generatePages()
+        })
+        initial = false
+      }
   
       this.compilation.fileDependencies.push(path.join(__dirname, '../src/routes.js'))
       this.watchFiles()
