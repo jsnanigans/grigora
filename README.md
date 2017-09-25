@@ -1,9 +1,7 @@
-# nemek
-
-> webpack static templates
+# nemek webpack
+> Generate static templates with webpack
 
 ## Build Setup
-
 ``` bash
 # install dependencies
 npm install
@@ -12,16 +10,69 @@ npm install
 npm run dev
 
 # build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run e2e tests
-npm run e2e
-
-# run all tests
-npm test
+npm run build # not done
 ```
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+to add templates edit `src/routes.js`
+```javascript
+  ...
+  pages: [
+    {
+      name: 'template-name',
+      components: [...components]
+  ]
+}
+```
+the components are in `src/components`, the component name is the directory name.
+there mus be a `.ejs` file inside the component root with the same name.
+for example: `src/components/image/image.ejs`:
+```ejs
+<div>
+  <h1>Image</h1>
+  <%= things.join(", ")  %>
+</div>
+```
+
+To insert data into the ejs template, create `seeds.js` inside the component root that exports a object:
+```javascript
+module.exports = {
+  things: ['Hi', 'Val', 'Paris']
+}
+```
+
+# Options
+To configure nemek, change `options` in `routes.js`
+
+### fileEnding
+> define the file ending of the template files that are created
+```javascript
+// default
+options: {
+  fileEnding: 'html'
+}
+```
+
+### beforeEach
+> add a module to the start of every page
+```javascript
+// default
+options: {
+  beforeEach: {
+    components: ['_head']
+  }
+}
+```
+
+### afterEach
+> add a module to the end of every page
+```javascript
+// default
+options: {
+  afterEach: {
+    components: ['_foot']
+  }
+}
+```
+
+
+For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/)
