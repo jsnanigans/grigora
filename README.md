@@ -1,6 +1,8 @@
 # nemek webpack
 > Generate static templates with webpack
 
+![Dependencies](https://david-dm.org/jsnanigans/iconfont-webpack-plugin.svg)
+
 ## Build Setup
 ``` bash
 # install dependencies
@@ -73,6 +75,3 @@ options: {
   }
 }
 ```
-
-
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/)
