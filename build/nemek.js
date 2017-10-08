@@ -43,10 +43,40 @@ function nemek(options) {
     let combinedHTML = ''
 
     let componentsObjects = components.map(comp => {
+      let base = path.join(__dirname, componentsPath) + comp
+
       let rt = {
         name: comp,
-        srcFile: path.join(__dirname, componentsPath) + comp + '/' + comp + '.ejs',
-        seedFile: path.join(__dirname, componentsPath) + comp + '/seeds.js',
+        srcFile: base + '/' + comp + '.ejs',
+        seedFile: base + '/seeds.js',
+      }
+
+      let configPath = base + '/config.nemek.js'
+      if (fs.existsSync(configPath)) {
+        if (this.relatedFiles.indexOf(configPath) === -1 && configPath !== '' && configPath) {
+          this.relatedFiles.push(configPath)
+        }
+        let conf = {}
+        try {
+          conf = requireUncached(configPath)
+        } catch (e) {
+          console.log('error reading: ' + configPath)
+        }
+
+        if (conf.template) {
+         if (conf.template.default) {
+           rt.srcFile = base + '/' + conf.template.default
+          } else {
+            rt.srcFile = base + '/' + conf.template
+         }
+        }
+        if (conf.seed) {
+         if (conf.seed.default) {
+           rt.seedFile = base + '/' + conf.seed.default
+          } else {
+            rt.seedFile = base + '/' + conf.seed
+         }
+        }
       }
 
       rt.seedData = fs.existsSync(rt.seedFile) ? requireUncached(rt.seedFile) : false

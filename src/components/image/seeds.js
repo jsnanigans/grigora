@@ -1,3 +1,3 @@
 module.exports = {
-  things: ['Hi', 'Val', 'Paris']
+  things: ['Test', 'Seed', 'Data']
 }

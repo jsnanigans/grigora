@@ -1,2 +1,2 @@
-// require('./style/img.sass')
-// console.log('asdee')
+require('./style/img.scss')
+console.log('init image')
