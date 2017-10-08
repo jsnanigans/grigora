@@ -2,7 +2,9 @@ const fs = require('fs')
 const ejs = require('ejs')
 const path = require('path')
 
-const componentsPath = '../src/components/' 
+const componentsPath = '../src/components/'
+
+var assets = []
 
 function requireUncached(module){
   delete require.cache[module]
@@ -106,6 +108,13 @@ function nemek(options) {
         
         combinedHTML += rendered + '\n'
 
+        let assetSources = ''
+        assets.forEach(asset => {
+          assetSources += '<script type="text/javascript" src="' + asset + '"></script>'
+        })
+
+        combinedHTML = combinedHTML.replace('{{insert_assets}}', assetSources)
+
         if (componentsObjects[ind + 1]) {
           renderComponent(ind + 1)
         } else {
@@ -141,6 +150,11 @@ nemek.prototype.apply = function (compiler) {
 
   this.distPath = compiler.options.output.path
   compiler.plugin('emit', function (compilation, callback) {
+    // console.log(compilation.assets)
+    assets = []
+    Object.keys(compilation.assets).forEach(key => {
+      assets.push('/' + key)
+    })
 
     let directory = path.join(__dirname, '../pages')
     fs.readdir(directory, (err, files) => {
