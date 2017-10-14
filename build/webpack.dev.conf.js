@@ -6,7 +6,7 @@ var path = require('path')
 var baseWebpackConfig = require('./webpack.base.conf')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
-var Nemek = require('./nemek')
+var grigoria = require('./grigoria')
 
 // add hot-reload related code to entry chunks
 Object.keys(baseWebpackConfig.entry).forEach(function (name) {
@@ -38,7 +38,7 @@ module.exports = merge(baseWebpackConfig, {
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-    new Nemek({
+    new grigoria({
       config: path.join(__dirname, '../src/routes.js')
     }),
     // https://github.com/ampedandwired/html-webpack-plugin

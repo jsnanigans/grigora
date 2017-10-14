@@ -11,7 +11,7 @@ function requireUncached(module){
   return require(module)
 }
 
-function nemek(options) {
+function grigoria(options) {
   // this.options = options
   this.configFile = options.config || false
   this.config = {}
@@ -53,7 +53,7 @@ function nemek(options) {
         seedFile: base + '/seeds.js',
       }
 
-      let configPath = base + '/config.nemek.js'
+      let configPath = base + '/config.grigoria.js'
       if (fs.existsSync(configPath)) {
         if (this.relatedFiles.indexOf(configPath) === -1 && configPath !== '' && configPath) {
           this.relatedFiles.push(configPath)
@@ -146,7 +146,7 @@ function nemek(options) {
   }
 }
 
-nemek.prototype.apply = function (compiler) {
+grigoria.prototype.apply = function (compiler) {
 
   this.distPath = compiler.options.output.path
   compiler.plugin('emit', function (compilation, callback) {
@@ -202,4 +202,4 @@ nemek.prototype.apply = function (compiler) {
   }.bind(this));
 };
 
-module.exports = nemek;
+module.exports = grigoria;
