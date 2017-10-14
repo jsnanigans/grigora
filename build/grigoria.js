@@ -50,7 +50,7 @@ function grigoria(options) {
       let rt = {
         name: comp,
         srcFile: base + '/' + comp + '.ejs',
-        seedFile: base + '/seeds.js',
+        seedFile: base + '/' + comp + '.seed.js',
       }
 
       let configPath = base + '/config.grigoria.js'
@@ -69,14 +69,14 @@ function grigoria(options) {
          if (conf.template.default) {
            rt.srcFile = base + '/' + conf.template.default
           } else {
-            rt.srcFile = base + '/' + conf.template
+            rt.srcFile = base + '/templates/' + conf.template
          }
         }
         if (conf.seed) {
          if (conf.seed.default) {
            rt.seedFile = base + '/' + conf.seed.default
           } else {
-            rt.seedFile = base + '/' + conf.seed
+            rt.seedFile = base + '/seeds/' + conf.seed
          }
         }
       }
@@ -96,7 +96,6 @@ function grigoria(options) {
     let renderComponent = (ind) => {
       let comp = componentsObjects[ind]
 
-
       this.readModuleTemplate(comp.srcFile, function (err, body) {
         let rendered = ''
         try {
@@ -113,9 +112,10 @@ function grigoria(options) {
           assetSources += '<script type="text/javascript" src="' + asset + '"></script>'
         })
 
-        combinedHTML = combinedHTML.replace('{{insert_assets}}', assetSources)
+        if (combinedHTML)
+          combinedHTML = combinedHTML.replace('{{insert_assets}}', assetSources)
 
-        if (componentsObjects[ind + 1]) {
+        if (typeof componentsObjects[ind + 1] !== 'undefined') {
           renderComponent(ind + 1)
         } else {
           fs.writeFile(path.join(__dirname, '../pages/') + name + '.' + (options.fileEnding || '.html'), combinedHTML, 'utf8', _ => {});
