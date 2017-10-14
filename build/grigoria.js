@@ -35,7 +35,7 @@ function grigoria(options) {
   this.startTime = Date.now()
   this.prevTimestamps = {}
 
-  this.generateSinglePage = (pageOpts, options) => {
+  this.generateSinglePage = (pageOpts, options, done) => {
     const name = pageOpts.name
     let prepend = options.beforeEach.components || []
     let append = options.afterEach.components || []
@@ -118,7 +118,8 @@ function grigoria(options) {
         if (typeof componentsObjects[ind + 1] !== 'undefined') {
           renderComponent(ind + 1)
         } else {
-          fs.writeFile(path.join(__dirname, '../pages/') + name + '.' + (options.fileEnding || '.html'), combinedHTML, 'utf8', _ => {});
+          fs.writeFile(path.join(__dirname, '../pages/') + name + '.' + (options.fileEnding || '.html'), combinedHTML, 'utf8', _ => {})
+          done()
         }
 
       });
@@ -133,7 +134,7 @@ function grigoria(options) {
     })
   }
 
-  this.generatePages = _ => {
+  this.generatePages = done => {
     // gernerate pages
 
     const conf = this.config
@@ -141,7 +142,7 @@ function grigoria(options) {
     const pages = conf.pages || []
 
     pages.forEach(page => {
-      this.generateSinglePage(page, options)
+      this.generateSinglePage(page, options, done)
     })
   }
 }
@@ -177,13 +178,13 @@ grigoria.prototype.apply = function (compiler) {
           this.loadConfig()
         }
         if (file === this.configFile || this.relatedFiles.indexOf(file) !== -1) {
-          this.generatePages()
-
-          if (compilation.hotMiddleware) {
-            setTimeout(_ => {
-              compilation.hotMiddleware.publish({ action: 'reload' })
-            })
-          }
+          this.generatePages(_ => {
+            if (compilation.hotMiddleware) {
+              setTimeout(_ => {
+                compilation.hotMiddleware.publish({ action: 'reload' })
+              })
+            }
+          })
         }
       })
       
@@ -191,7 +192,7 @@ grigoria.prototype.apply = function (compiler) {
       this.compilation = compilation
   
       this.loadConfig()
-      this.generatePages()
+      this.generatePages(_ => {})
   
       this.compilation.fileDependencies.push(path.join(__dirname, '../src/routes.js'))
       this.watchFiles()

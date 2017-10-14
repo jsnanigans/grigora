@@ -11,7 +11,24 @@ module.exports = {
   pages: [
     {
       name: 'index',
-      components: ['image']
+      components: [
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image'
+      ]
     }
   ]
 }
