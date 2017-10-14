@@ -1,7 +1,7 @@
-# nemek webpack
-> Generate static templates with webpack
+# grigora
+> Static site generator with webpack
 
-![Dependencies](https://david-dm.org/jsnanigans/iconfont-webpack-plugin.svg)
+![Dependencies](https://david-dm.org/jsnanigans/grigora.svg)
 
 ## Build Setup
 ``` bash
