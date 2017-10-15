@@ -55,30 +55,42 @@ function grigora (options) {
   this.startTime = Date.now()
   this.prevTimestamps = {}
 
+  let insertAssets = html => {
+    if (html.indexOf('{{insert_assets}}') !== -1) {
+      let assetSources = ''
+      assets.forEach(asset => {
+        assetSources += '<script type="text/javascript" src="' + asset + '"></script>'
+      })
+
+      html = html.replace('{{insert_assets}}', assetSources)
+    }
+
+    return html
+  }
+
+  let renderTemplate = (body, seed) => {
+    let rendered = ''
+    try {
+      rendered = ejs.render(body, seed)
+    } catch (e) {
+      console.log(e)
+    }
+
+    return rendered
+  }
+
   this.renderSingleComponent = (comp, rtfn) => {
-    let modID = Math.random()
+    let modID = comp.srcFile.split('/')
+    modID = modID[modID.length - 3] + ' - ' + modID[modID.length - 1]
     let modStart = Date.now()
     log.add('start module ' + modID)
     this.readModuleTemplate(comp.srcFile, function (err, body) {
       if (err) {
-        // console.error(err)
+        console.error(err)
       }
 
-      let rendered = ''
-      try {
-        rendered = ejs.render(body, comp.seedData)
-      } catch (e) {
-        console.log(e)
-      }
-
-      if (rendered.indexOf('{{insert_assets}}') !== -1) {
-        let assetSources = ''
-        assets.forEach(asset => {
-          assetSources += '<script type="text/javascript" src="' + asset + '"></script>'
-        })
-
-        rendered = rendered.replace('{{insert_assets}}', assetSources)
-      }
+      let rendered = renderTemplate(body, comp.seedData)
+      rendered = insertAssets(rendered)
 
       log.add('fin module ' + modID + ' - ' + (Date.now() - modStart + 'ms'))
       if (rtfn) {
@@ -86,34 +98,43 @@ function grigora (options) {
       } else {
         return rendered
       }
-      // combinedHTML += rendered + '\n'
-      // if (typeof componentsObjects[ind + 1] !== 'undefined') {
-      //   this.renderComponent(ind + 1)
-      // } else {
-      //   modulesDone(combinedHTML)
-      // }
     })
   }
+
 
   this.renderComponents = (componentsObjects, modulesDone) => {
     let combinedHTML = []
     let comps = componentsObjects
 
     let compsDone = 0
-    let comsTotal = comps.length
+    let compsTotal = comps.length
 
-    if (comsTotal) {
-      comps.forEach((comp, index) => {
-        this.renderSingleComponent(comp, rendered => {
-          combinedHTML[index] = rendered
-          compsDone++
-          if (compsDone === comsTotal) {
-            setTimeout(_ => {
-              modulesDone(combinedHTML.join(''))
-            })
-          }
-        })
-      })
+    if (compsTotal) {
+      // sync components
+      let compCallback = rendered => {
+        combinedHTML[compsDone] = rendered
+        compsDone++
+
+        if (compsDone === compsTotal) {
+          modulesDone(combinedHTML.join(''))
+        } else {
+          this.renderSingleComponent(comps[compsDone], compCallback)
+        }
+      }
+      this.renderSingleComponent(comps[compsDone], compCallback)
+
+      // async compile
+      // comps.forEach((comp, index) => {
+      //   this.renderSingleComponent(comp, rendered => {
+      //     combinedHTML[index] = rendered
+      //     compsDone++
+      //     if (compsDone === compsTotal) {
+      //       setTimeout(_ => {
+      //         modulesDone(combinedHTML.join(''))
+      //       })
+      //     }
+      //   })
+      // })
     } else {
       modulesDone(combinedHTML.join(''))
     }
