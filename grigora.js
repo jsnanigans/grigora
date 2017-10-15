@@ -4,6 +4,8 @@ const path = require('path')
 const componentsPath = './src/components/'
 var assets = []
 
+let cacheAge = 1.2e+6 // 20 minutes
+
 const componentCache = {}
 
 let log = {
@@ -68,18 +70,32 @@ function grigora (options) {
     return html
   }
 
+  this.cleanOldComponentCache = _ => {
+    let now = Date.now()
+    Object.keys(componentCache).forEach(key => {
+      let date = componentCache[key][0]
+      if (now - cacheAge > date) {
+        delete componentCache[key]
+      }
+    })
+  }
+
   let renderTemplate = (body, seed) => {
     let idString = body + JSON.stringify(seed)
-    let cached = componentCache[idString]
+    let cached = componentCache[idString] || [false, false]
+    let now = Date.now()
 
-    if (typeof cached !== 'undefined') {
-      return cached
+    if (cached[0] !== false &&
+        now - cacheAge > cached[0]) {
+      cached[0] = now
+
+      return cached[1]
     }
 
     let rendered = ''
     try {
       rendered = ejs.render(body, seed)
-      componentCache[idString] = rendered
+      componentCache[idString] = [now, rendered]
     } catch (e) {
       console.log(e)
     }
@@ -108,7 +124,6 @@ function grigora (options) {
       }
     })
   }
-
 
   this.renderComponents = (componentsObjects, modulesDone) => {
     let combinedHTML = []
@@ -275,6 +290,7 @@ grigora.prototype.apply = function (compiler) {
             if (compilation.hotMiddleware) {
               setTimeout(_ => {
                 compilation.hotMiddleware.publish({ action: 'reload' })
+                this.cleanOldComponentCache()
               })
             }
           })
