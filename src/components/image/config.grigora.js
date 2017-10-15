@@ -1,8 +1,8 @@
 module.exports = {
   template: {
-    default: 'templates/image.ejs'
+    default: 'templates/default.ejs'
   },
   seed: {
-    default: 'seeds/image.js'
+    default: 'seeds/default.js'
   }
 }

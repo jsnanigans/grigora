@@ -13,20 +13,6 @@ module.exports = {
       name: 'index',
       components: [
         'image',
-        'image',
-        'image',
-        'image',
-        'image',
-        'image',
-        'image',
-        'image',
-        'image',
-        'image',
-        'image',
-        'image',
-        'image',
-        'image',
-        'image',
         'image'
       ]
     }

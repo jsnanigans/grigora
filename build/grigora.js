@@ -49,8 +49,8 @@ function grigora(options) {
 
       let rt = {
         name: comp,
-        srcFile: base + '/' + comp + '.ejs',
-        seedFile: base + '/' + comp + '.seed.js',
+        srcFile: base + '/templates/default.ejs',
+        seedFile: base + '/seeds/default.js',
       }
 
       let configPath = base + '/config.grigora.js'
@@ -82,7 +82,6 @@ function grigora(options) {
       }
 
       rt.seedData = fs.existsSync(rt.seedFile) ? requireUncached(rt.seedFile) : false
-
       if (this.relatedFiles.indexOf(rt.srcFile) === -1 && rt.srcFile !== '' && rt.srcFile) {
         this.relatedFiles.push(rt.srcFile)
       }
