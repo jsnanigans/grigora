@@ -5,6 +5,7 @@ const componentsPath = './src/components/'
 var assets = []
 
 let cacheAge = 1.2e+6 // 20 minutes
+// let cacheAge = 1000 // 20 minutes
 
 const componentCache = {}
 
@@ -74,8 +75,8 @@ function grigora (options) {
     let now = Date.now()
     Object.keys(componentCache).forEach(key => {
       let date = componentCache[key][0]
-      if (now - cacheAge > date) {
-        delete componentCache[key]
+      if (now - cacheAge < date) {
+        // delete componentCache[key]
       }
     })
   }
@@ -86,7 +87,7 @@ function grigora (options) {
     let now = Date.now()
 
     if (cached[0] !== false &&
-        now - cacheAge > cached[0]) {
+        now - cacheAge < cached[0]) {
       cached[0] = now
 
       return cached[1]

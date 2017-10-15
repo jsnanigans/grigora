@@ -17,9 +17,6 @@ module.exports = {
         'image',
         'image',
         'image',
-        'image',
-        'image',
-        'image',
         'image'
       ]
     }
