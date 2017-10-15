@@ -18,9 +18,11 @@ let log = {
     this.log += t + '\n'
   },
   print: _ => {
-    console.log('=======')
-    console.log(this.log)
-    console.log('=======')
+    setTimeout(_ => {
+      console.log('=======')
+      console.log(this.log)
+      console.log('=======')
+    })
   }
 }
 
@@ -53,14 +55,80 @@ function grigora (options) {
   this.startTime = Date.now()
   this.prevTimestamps = {}
 
-  this.generateSinglePage = (pageOpts, options, pageDone) => {
+  this.renderSingleComponent = (comp, rtfn) => {
+    let modID = Math.random()
+    let modStart = Date.now()
+    log.add('start module ' + modID)
+    this.readModuleTemplate(comp.srcFile, function (err, body) {
+      if (err) {
+        // console.error(err)
+      }
+
+      let rendered = ''
+      try {
+        rendered = ejs.render(body, comp.seedData)
+      } catch (e) {
+        console.log(e)
+      }
+
+      if (rendered.indexOf('{{insert_assets}}') !== -1) {
+        let assetSources = ''
+        assets.forEach(asset => {
+          assetSources += '<script type="text/javascript" src="' + asset + '"></script>'
+        })
+
+        rendered = rendered.replace('{{insert_assets}}', assetSources)
+      }
+
+      log.add('fin module ' + modID + ' - ' + (Date.now() - modStart + 'ms'))
+      if (rtfn) {
+        rtfn(rendered)
+      } else {
+        return rendered
+      }
+      // combinedHTML += rendered + '\n'
+      // if (typeof componentsObjects[ind + 1] !== 'undefined') {
+      //   this.renderComponent(ind + 1)
+      // } else {
+      //   modulesDone(combinedHTML)
+      // }
+    })
+  }
+
+  this.renderComponents = (componentsObjects, modulesDone) => {
+    let combinedHTML = []
+    let comps = componentsObjects
+
+    let compsDone = 0
+    let comsTotal = comps.length
+
+    if (comsTotal) {
+      comps.forEach((comp, index) => {
+        this.renderSingleComponent(comp, rendered => {
+          combinedHTML[index] = rendered
+          compsDone++
+          if (compsDone === comsTotal) {
+            setTimeout(_ => {
+              modulesDone(combinedHTML.join(''))
+            })
+          }
+        })
+      })
+    } else {
+      modulesDone(combinedHTML.join(''))
+    }
+  }
+
+  this.generatePage = (pageOpts, options, pageDone) => {
     const name = pageOpts.name
+
+    log.add('start page: ' + name)
+    let pageStart = Date.now()
+
     let prepend = options.beforeEach.components || []
     let append = options.afterEach.components || []
 
     let components = prepend.concat(pageOpts.components).concat(append)
-
-    let combinedHTML = ''
 
     let componentsObjects = components.map(comp => {
       let base = path.join(__dirname, componentsPath) + comp
@@ -110,41 +178,11 @@ function grigora (options) {
       return rt
     })
 
-    let renderComponent = (ind) => {
-      let comp = componentsObjects[ind]
-
-      this.readModuleTemplate(comp.srcFile, function (err, body) {
-        if (err) {
-          console.error(err)
-        }
-
-        let rendered = ''
-        try {
-          rendered = ejs.render(body, comp.seedData)
-        } catch (e) {
-          console.log(e)
-        }
-
-        combinedHTML += rendered + '\n'
-
-        let assetSources = ''
-        assets.forEach(asset => {
-          assetSources += '<script type="text/javascript" src="' + asset + '"></script>'
-        })
-
-        if (combinedHTML) {
-          combinedHTML = combinedHTML.replace('{{insert_assets}}', assetSources)
-        }
-        if (typeof componentsObjects[ind + 1] !== 'undefined') {
-          renderComponent(ind + 1)
-        } else {
-          fs.writeFile(path.join(__dirname, './pages/') + name + '.' + (options.fileEnding || '.html'), combinedHTML, 'utf8', _ => {})
-          pageDone()
-        }
-      })
-    }
-
-    renderComponent(0)
+    this.renderComponents(componentsObjects, (allHTML) => {
+      fs.writeFile(path.join(__dirname, './pages/') + name + '.' + (options.fileEnding || '.html'), allHTML, 'utf8', _ => {})
+      log.add('page done ' + name + ' - ' + (Date.now() - pageStart) + 'ms')
+      pageDone()
+    })
   }
 
   this.watchFiles = _ => {
@@ -161,11 +199,11 @@ function grigora (options) {
     const pages = conf.pages || []
 
     let pagesDone = 0
-    console.log('pages', pages.length, Date.now())
     pages.forEach(page => {
-      this.generateSinglePage(page, options, _ => {
+      this.generatePage(page, options, _ => {
         pagesDone++
         if (pagesDone === pages.length) {
+          log.print()
           done()
         }
       })
@@ -186,11 +224,12 @@ grigora.prototype.apply = function (compiler) {
 
     let directory = path.join(__dirname, './pages')
     fs.readdir(directory, (err, files) => {
+      log.clear()
       if (err) throw err
 
       for (const file of files) {
-        fs.unlink(path.join(directory, file), err => {
-          console.error(err)
+        fs.unlinkSync(path.join(directory, file), err => {
+          console.error('error unlinking - ' + path.join(directory, file) + ' - ' + err)
         })
       }
 
