@@ -43,7 +43,7 @@ module.exports = {
 ```
 
 # Options
-To configure grigoria, change `options` in `routes.js`
+To configure grigora, change `options` in `routes.js`
 
 ### fileEnding
 > define the file ending of the template files that are created

@@ -11,7 +11,7 @@ function requireUncached(module){
   return require(module)
 }
 
-function grigoria(options) {
+function grigora(options) {
   // this.options = options
   this.configFile = options.config || false
   this.config = {}
@@ -53,7 +53,7 @@ function grigoria(options) {
         seedFile: base + '/' + comp + '.seed.js',
       }
 
-      let configPath = base + '/config.grigoria.js'
+      let configPath = base + '/config.grigora.js'
       if (fs.existsSync(configPath)) {
         if (this.relatedFiles.indexOf(configPath) === -1 && configPath !== '' && configPath) {
           this.relatedFiles.push(configPath)
@@ -147,7 +147,7 @@ function grigoria(options) {
   }
 }
 
-grigoria.prototype.apply = function (compiler) {
+grigora.prototype.apply = function (compiler) {
 
   this.distPath = compiler.options.output.path
   compiler.plugin('emit', function (compilation, callback) {
@@ -203,4 +203,4 @@ grigoria.prototype.apply = function (compiler) {
   }.bind(this));
 };
 
-module.exports = grigoria;
+module.exports = grigora;
