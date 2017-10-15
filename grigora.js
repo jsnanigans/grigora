@@ -1,10 +1,10 @@
 const fs = require('fs')
 const ejs = require('ejs')
 const path = require('path')
-
 const componentsPath = './src/components/'
-
 var assets = []
+
+const componentCache = {}
 
 let log = {
   log: '',
@@ -69,9 +69,17 @@ function grigora (options) {
   }
 
   let renderTemplate = (body, seed) => {
+    let idString = body + JSON.stringify(seed)
+    let cached = componentCache[idString]
+
+    if (typeof cached !== 'undefined') {
+      return cached
+    }
+
     let rendered = ''
     try {
       rendered = ejs.render(body, seed)
+      componentCache[idString] = rendered
     } catch (e) {
       console.log(e)
     }
