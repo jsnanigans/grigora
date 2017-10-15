@@ -2,27 +2,45 @@ const fs = require('fs')
 const ejs = require('ejs')
 const path = require('path')
 
-const componentsPath = '../src/components/'
+const componentsPath = './src/components/'
 
 var assets = []
 
-function requireUncached(module){
+let log = {
+  log: '',
+  clear: _ => {
+    this.log = ''
+  },
+  add: t => {
+    if (typeof this.log !== 'string') {
+      this.log = ''
+    }
+    this.log += t + '\n'
+  },
+  print: _ => {
+    console.log('=======')
+    console.log(this.log)
+    console.log('=======')
+  }
+}
+
+function requireUncached (module) {
   delete require.cache[module]
   return require(module)
 }
 
-function grigora(options) {
+function grigora (options) {
   // this.options = options
   this.configFile = options.config || false
   this.config = {}
-  this.relatedFiles = [];
+  this.relatedFiles = []
 
   this.readModuleTemplate = (path, callback) => {
     try {
-        var filename = require.resolve(path);
-        fs.readFile(filename, 'utf8', callback);
+      var filename = require.resolve(path)
+      fs.readFile(filename, 'utf8', callback)
     } catch (e) {
-        callback(e);
+      callback(e)
     }
   }
 
@@ -35,7 +53,7 @@ function grigora(options) {
   this.startTime = Date.now()
   this.prevTimestamps = {}
 
-  this.generateSinglePage = (pageOpts, options, done) => {
+  this.generateSinglePage = (pageOpts, options, pageDone) => {
     const name = pageOpts.name
     let prepend = options.beforeEach.components || []
     let append = options.afterEach.components || []
@@ -50,7 +68,7 @@ function grigora(options) {
       let rt = {
         name: comp,
         srcFile: base + '/templates/default.ejs',
-        seedFile: base + '/seeds/default.js',
+        seedFile: base + '/seeds/default.js'
       }
 
       let configPath = base + '/config.grigora.js'
@@ -66,18 +84,18 @@ function grigora(options) {
         }
 
         if (conf.template) {
-         if (conf.template.default) {
-           rt.srcFile = base + '/' + conf.template.default
+          if (conf.template.default) {
+            rt.srcFile = base + '/' + conf.template.default
           } else {
             rt.srcFile = base + '/templates/' + conf.template
-         }
+          }
         }
         if (conf.seed) {
-         if (conf.seed.default) {
-           rt.seedFile = base + '/' + conf.seed.default
+          if (conf.seed.default) {
+            rt.seedFile = base + '/' + conf.seed.default
           } else {
             rt.seedFile = base + '/seeds/' + conf.seed
-         }
+          }
         }
       }
 
@@ -96,14 +114,17 @@ function grigora(options) {
       let comp = componentsObjects[ind]
 
       this.readModuleTemplate(comp.srcFile, function (err, body) {
+        if (err) {
+          console.error(err)
+        }
+
         let rendered = ''
         try {
           rendered = ejs.render(body, comp.seedData)
-        } 
-        catch (e) {
+        } catch (e) {
           console.log(e)
         }
-        
+
         combinedHTML += rendered + '\n'
 
         let assetSources = ''
@@ -111,19 +132,18 @@ function grigora(options) {
           assetSources += '<script type="text/javascript" src="' + asset + '"></script>'
         })
 
-        if (combinedHTML)
+        if (combinedHTML) {
           combinedHTML = combinedHTML.replace('{{insert_assets}}', assetSources)
-
+        }
         if (typeof componentsObjects[ind + 1] !== 'undefined') {
           renderComponent(ind + 1)
         } else {
-          fs.writeFile(path.join(__dirname, '../pages/') + name + '.' + (options.fileEnding || '.html'), combinedHTML, 'utf8', _ => {})
-          done()
+          fs.writeFile(path.join(__dirname, './pages/') + name + '.' + (options.fileEnding || '.html'), combinedHTML, 'utf8', _ => {})
+          pageDone()
         }
-
-      });
+      })
     }
-    
+
     renderComponent(0)
   }
 
@@ -140,14 +160,22 @@ function grigora(options) {
     const options = conf.options || {}
     const pages = conf.pages || []
 
+    let pagesDone = 0
+    console.log('pages', pages.length, Date.now())
     pages.forEach(page => {
-      this.generateSinglePage(page, options, done)
+      this.generateSinglePage(page, options, _ => {
+        pagesDone++
+        if (pagesDone === pages.length) {
+          done()
+        }
+      })
     })
   }
+
+  this.initial = true
 }
 
 grigora.prototype.apply = function (compiler) {
-
   this.distPath = compiler.options.output.path
   compiler.plugin('emit', function (compilation, callback) {
     // console.log(compilation.assets)
@@ -156,22 +184,20 @@ grigora.prototype.apply = function (compiler) {
       assets.push('/' + key)
     })
 
-    let directory = path.join(__dirname, '../pages')
+    let directory = path.join(__dirname, './pages')
     fs.readdir(directory, (err, files) => {
-      if (err) throw err;
-    
+      if (err) throw err
+
       for (const file of files) {
         fs.unlink(path.join(directory, file), err => {
-          if (err) throw error;
-        });
+          console.error(err)
+        })
       }
 
-
       var changedFiles = Object.keys(compilation.fileTimestamps).filter(function (watchfile) {
-        return (this.prevTimestamps[watchfile] || this.startTime) < (compilation.fileTimestamps[watchfile] || Infinity);
-      }.bind(this));
+        return (this.prevTimestamps[watchfile] || this.startTime) < (compilation.fileTimestamps[watchfile] || Infinity)
+      }.bind(this))
 
-  
       changedFiles.forEach(file => {
         if (file === this.configFile) {
           this.loadConfig()
@@ -186,20 +212,21 @@ grigora.prototype.apply = function (compiler) {
           })
         }
       })
-      
-      this.prevTimestamps = compilation.fileTimestamps;
+
+      this.prevTimestamps = compilation.fileTimestamps
       this.compilation = compilation
-  
-      this.loadConfig()
-      this.generatePages(_ => {})
-  
-      this.compilation.fileDependencies.push(path.join(__dirname, '../src/routes.js'))
+      if (this.initial) {
+        this.initial = false
+
+        this.loadConfig()
+        this.generatePages(_ => {})
+      }
+
+      this.compilation.fileDependencies.push(path.join(__dirname, './src/routes.js'))
       this.watchFiles()
-  
-      callback();
-    });
+      callback()
+    })
+  }.bind(this))
+}
 
-  }.bind(this));
-};
-
-module.exports = grigora;
+module.exports = grigora
