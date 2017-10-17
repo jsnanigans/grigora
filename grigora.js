@@ -1,6 +1,8 @@
 const fs = require('fs')
-const ejs = require('ejs')
 const path = require('path')
+// const ejs = require('ejs')
+// const handlebars = require('handlebars')
+const ECT = require('ect')
 const componentsPath = './src/components/'
 var assets = []
 
@@ -87,7 +89,7 @@ function grigora (options) {
     let now = Date.now()
 
     if (cached[0] !== false &&
-        now - cacheAge < cached[0]) {
+      now - cacheAge < cached[0]) {
       cached[0] = now
 
       return cached[1]
@@ -95,7 +97,16 @@ function grigora (options) {
 
     let rendered = ''
     try {
-      rendered = ejs.render(body, seed)
+      // rendered = ejs.render(body, seed)
+      // let tmpl = handlebars.compile(body)
+      // rendered = tmpl(seed)
+      let renderer = ECT({
+        root: {
+          layout: '<% content %>',
+          page: body
+        }
+      })
+      rendered = renderer.render('page', seed)
       componentCache[idString] = [now, rendered]
     } catch (e) {
       console.log(e)
@@ -180,7 +191,7 @@ function grigora (options) {
 
       let rt = {
         name: comp,
-        srcFile: base + '/templates/default.ejs',
+        srcFile: base + '/templates/default.html',
         seedFile: base + '/seeds/default.js'
       }
 
@@ -294,7 +305,9 @@ grigora.prototype.apply = function (compiler) {
           this.generatePages(_ => {
             if (compilation.hotMiddleware) {
               setTimeout(_ => {
-                compilation.hotMiddleware.publish({ action: 'reload' })
+                compilation.hotMiddleware.publish({
+                  action: 'reload'
+                })
                 this.cleanOldComponentCache()
               })
             }

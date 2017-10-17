@@ -14,6 +14,7 @@
     "lint": "eslint --ext .js,.vue src test/e2e/specs"
   },
   "dependencies": {
+    "ect": "^0.5.9",
     "ejs": "^2.5.7",
     "ejs2-loader": "^1.0.0",
     "eslint-plugin-import": "^2.7.0",
