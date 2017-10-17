@@ -1,2 +1,2 @@
-require('./style/img.scss')
+require('./style/img.styl')
 console.log('init image')

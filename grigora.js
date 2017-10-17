@@ -224,7 +224,7 @@ function grigora (options) {
     })
 
     this.renderComponents(componentsObjects, (allHTML) => {
-      fs.writeFile(path.join(__dirname, './pages/') + name + '.' + (options.fileEnding || '.html'), allHTML, 'utf8', _ => {})
+      fs.writeFile(path.join(__dirname, './dist/') + name + '.' + (options.fileEnding || '.html'), allHTML, 'utf8', _ => {})
       log.add('page done ' + name + ' - ' + (Date.now() - pageStart) + 'ms')
       pageDone()
     })
@@ -267,7 +267,11 @@ grigora.prototype.apply = function (compiler) {
       assets.push('/' + key)
     })
 
-    let directory = path.join(__dirname, './pages')
+    let directory = path.join(__dirname, './dist')
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory)
+    }
+
     fs.readdir(directory, (err, files) => {
       log.clear()
       if (err) throw err

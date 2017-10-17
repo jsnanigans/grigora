@@ -1,2 +1,2 @@
 require('@/components/image')
-require('./test.scss')
+require('./test.styl')

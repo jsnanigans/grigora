@@ -27,6 +27,17 @@ module.exports = merge(baseWebpackConfig, {
             loader: "sass-loader" // compiles Sass to CSS
         }]
       },
+      {
+        test: /\.styl$/,
+        // include: [resolve('src'), resolve('test')],
+        use: [{
+            loader: "style-loader" // creates style nodes from JS strings
+        }, {
+            loader: "css-loader" // translates CSS into CommonJS
+        }, {
+            loader: "stylus-loader" // compiles stylus to CSS
+        }]
+      },
     ]
   },
   // cheap-module-eval-source-map is faster for development
