@@ -10,6 +10,7 @@ let cacheAge = 1.2e+6 // 20 minutes
 // let cacheAge = 1000 // 20 minutes
 
 const componentCache = {}
+const fileCache = {}
 
 let log = {
   log: '',
@@ -31,9 +32,21 @@ let log = {
   }
 }
 
-function requireUncached (module) {
-  delete require.cache[module]
-  return require(module)
+// function requireUncached (module) {
+//   delete require.cache[module]
+//   return require(module)
+// }
+
+function dropCache (name) {
+  Object.keys(componentCache).forEach(key => {
+    if (key.indexOf(name) !== -1) {
+      delete componentCache[key]
+    }
+  })
+
+  if (fileCache[name]) {
+    delete fileCache[name]
+  }
 }
 
 function grigora (options) {
@@ -45,7 +58,13 @@ function grigora (options) {
   this.readModuleTemplate = (path, callback) => {
     try {
       var filename = require.resolve(path)
-      fs.readFile(filename, 'utf8', callback)
+      if (fileCache[filename]) {
+        callback(fileCache[fileCache])
+      } else {
+        let fileContent = fs.readFileSync(filename, 'utf8')
+        fileCache[filename] = fileContent
+        callback(fileContent)
+      }
     } catch (e) {
       callback(e)
     }
@@ -53,7 +72,7 @@ function grigora (options) {
 
   this.loadConfig = _ => {
     if (this.configFile) {
-      this.config = requireUncached(this.configFile)
+      this.config = require(this.configFile)
     }
   }
 
@@ -83,14 +102,14 @@ function grigora (options) {
     })
   }
 
-  let renderTemplate = (body, seed) => {
-    let idString = body + JSON.stringify(seed)
-    let cached = componentCache[idString] || [false, false]
+  let renderTemplate = (body, seed, cacheName) => {
+    let cached = componentCache[cacheName] || [false, false]
     let now = Date.now()
 
     if (cached[0] !== false &&
       now - cacheAge < cached[0]) {
       cached[0] = now
+      log.add('cache used')
 
       return cached[1]
     }
@@ -107,7 +126,8 @@ function grigora (options) {
         }
       })
       rendered = renderer.render('page', seed)
-      componentCache[idString] = [now, rendered]
+      log.add('cache created')
+      componentCache[cacheName] = [now, rendered]
     } catch (e) {
       console.log(e)
     }
@@ -120,15 +140,12 @@ function grigora (options) {
     modID = modID[modID.length - 3] + ' - ' + modID[modID.length - 1]
     let modStart = Date.now()
     log.add('start module ' + modID)
-    this.readModuleTemplate(comp.srcFile, function (err, body) {
-      if (err) {
-        console.error(err)
-      }
-
-      let rendered = renderTemplate(body, comp.seedData)
+    this.readModuleTemplate(comp.srcFile, body => {
+      let cacheName = comp.srcFile + '++' + comp.seedFile
+      let rendered = renderTemplate(body, comp.seedData, cacheName)
+      log.add('fin module ' + modID + ' - ' + (Date.now() - modStart + 'ms'))
       rendered = insertAssets(rendered)
 
-      log.add('fin module ' + modID + ' - ' + (Date.now() - modStart + 'ms'))
       if (rtfn) {
         rtfn(rendered)
       } else {
@@ -140,36 +157,40 @@ function grigora (options) {
   this.renderComponents = (componentsObjects, modulesDone) => {
     let combinedHTML = []
     let comps = componentsObjects
+    let sync = false
 
     let compsDone = 0
     let compsTotal = comps.length
 
     if (compsTotal) {
-      // sync components
-      let compCallback = rendered => {
-        combinedHTML[compsDone] = rendered
-        compsDone++
+      if (!sync) {
+        // sync components
+        let compCallback = rendered => {
+          log.add('start')
+          combinedHTML[compsDone] = rendered
+          compsDone++
 
-        if (compsDone === compsTotal) {
-          modulesDone(combinedHTML.join(''))
-        } else {
-          this.renderSingleComponent(comps[compsDone], compCallback)
+          if (compsDone === compsTotal) {
+            modulesDone(combinedHTML.join(''))
+          } else {
+            this.renderSingleComponent(comps[compsDone], compCallback)
+          }
         }
+        this.renderSingleComponent(comps[compsDone], compCallback)
+      } else {
+        // async compile
+        comps.forEach((comp, index) => {
+          log.add('start')
+          this.renderSingleComponent(comp, rendered => {
+            combinedHTML[index] = rendered
+            compsDone++
+            if (compsDone === compsTotal) {
+              modulesDone(combinedHTML.join(''))
+            }
+          })
+        })
       }
-      this.renderSingleComponent(comps[compsDone], compCallback)
 
-      // async compile
-      // comps.forEach((comp, index) => {
-      //   this.renderSingleComponent(comp, rendered => {
-      //     combinedHTML[index] = rendered
-      //     compsDone++
-      //     if (compsDone === compsTotal) {
-      //       setTimeout(_ => {
-      //         modulesDone(combinedHTML.join(''))
-      //       })
-      //     }
-      //   })
-      // })
     } else {
       modulesDone(combinedHTML.join(''))
     }
@@ -202,7 +223,7 @@ function grigora (options) {
         }
         let conf = {}
         try {
-          conf = requireUncached(configPath)
+          conf = require(configPath)
         } catch (e) {
           console.log('error reading: ' + configPath)
         }
@@ -223,7 +244,7 @@ function grigora (options) {
         }
       }
 
-      rt.seedData = fs.existsSync(rt.seedFile) ? requireUncached(rt.seedFile) : false
+      rt.seedData = fs.existsSync(rt.seedFile) ? require(rt.seedFile) : false
       if (this.relatedFiles.indexOf(rt.srcFile) === -1 && rt.srcFile !== '' && rt.srcFile) {
         this.relatedFiles.push(rt.srcFile)
       }
@@ -298,6 +319,8 @@ grigora.prototype.apply = function (compiler) {
       }.bind(this))
 
       changedFiles.forEach(file => {
+        delete require.cache[file]
+        dropCache(file)
         if (file === this.configFile) {
           this.loadConfig()
         }

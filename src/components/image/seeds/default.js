@@ -1,7 +1,6 @@
 let links = []
-links.length = 20000
+links.length = 20
 
 module.exports = {
-  things: ['Test', 'Seed', 'Data'],
   links
 }
