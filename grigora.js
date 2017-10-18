@@ -10,6 +10,7 @@ let cacheAge = 1.2e+6 // 20 minutes
 // let cacheAge = 1000 // 20 minutes
 
 const componentCache = {}
+const componentAssets = {}
 const fileCache = {}
 
 let log = {
@@ -38,15 +39,28 @@ let log = {
 // }
 
 function dropCache (name) {
+  // crear file from componentCache
   Object.keys(componentCache).forEach(key => {
     if (key.indexOf(name) !== -1) {
       delete componentCache[key]
     }
   })
 
+  // clear file cache
   if (fileCache[name]) {
     delete fileCache[name]
   }
+
+  // clear componentCache if include is updates
+  Object.keys(componentAssets).forEach(key => {
+    if (name === key) {
+      componentAssets[key].forEach(compKey => {
+        if (componentCache[compKey]) {
+          delete componentCache[compKey]
+        }
+      })
+    }
+  })
 }
 
 function grigora (options) {
@@ -60,7 +74,6 @@ function grigora (options) {
   this.parseAssetPath = assetPath => {
     let basePath = path.join(__dirname, 'src')
     let rt = false
-    // console.log(basePath + '04_' + assetPath)
 
     if (assetPath.indexOf('layouts') === 0) {
       rt = basePath + '/04_' + assetPath
@@ -77,7 +90,7 @@ function grigora (options) {
   }
 
   // resolve custom includes and replace with the tempalte
-  this.includeTemplates = template => {
+  this.includeTemplates = (template, cacheName) => {
     let match
     do {
       match = incTemplateRegex.exec(template)
@@ -89,6 +102,14 @@ function grigora (options) {
         }
 
         let resolvedPath = this.parseAssetPath(assetPath)
+
+        if (typeof componentAssets[resolvedPath] === 'undefined') {
+          componentAssets[resolvedPath] = []
+        }
+        if (componentAssets[resolvedPath].indexOf(cacheName) === -1) {
+          componentAssets[resolvedPath].push(cacheName)
+        }
+
         try {
           let fileContent = fs.readFileSync(resolvedPath, 'utf8')
           template = template.replace(snippet, fileContent)
@@ -101,18 +122,29 @@ function grigora (options) {
     return template
   }
 
+  this.includeTemplatesRecursive = (template, cacheName) => {
+    let tmp = template
+
+    tmp = this.includeTemplates(tmp, cacheName)
+    tmp = this.includeTemplates(tmp, cacheName)
+
+    return tmp
+  }
+
   this.readModuleTemplate = (templatePath, callback) => {
     try {
       var filename = require.resolve(templatePath)
+
       if (fileCache[filename]) {
-        callback(fileCache[fileCache])
+        callback(fileCache[filename])
       } else {
         let fileContent = fs.readFileSync(filename, 'utf8')
         fileCache[filename] = fileContent
         callback(fileContent)
       }
     } catch (e) {
-      callback(e)
+      // callback(e)
+      console.log('readModuleTemplate failed')
     }
   }
 
@@ -150,6 +182,7 @@ function grigora (options) {
 
   let renderTemplate = (body, seed, cacheName) => {
     let cached = componentCache[cacheName] || [false, false]
+    // let cached = [false, false]
     let now = Date.now()
 
     if (cached[0] !== false &&
@@ -162,20 +195,25 @@ function grigora (options) {
 
     let rendered = ''
 
-    body = this.includeTemplates(body)
+    body = this.includeTemplatesRecursive(body, cacheName)
     try {
       // rendered = ejs.render(body, seed)
       // let tmpl = handlebars.compile(body)
       // rendered = tmpl(seed)
-      let renderer = ECT({
-        root: {
-          layout: '<% content %>',
-          page: body
-        }
-      })
-      rendered = renderer.render('page', seed)
-      log.add('cache created')
-      componentCache[cacheName] = [now, rendered]
+
+      if (body) {
+        let renderer = ECT({
+          root: {
+            layout: '<% content %>',
+            page: body
+          }
+        })
+        rendered = renderer.render('page', seed)
+        log.add('cache created')
+        componentCache[cacheName] = [now, rendered]
+      } else {
+        console.log('body is ', body)
+      }
     } catch (e) {
       console.log(e)
     }
