@@ -20,6 +20,12 @@ module.exports = {
         'image',
         'image'
       ]
+    },
+    {
+      name: 'xx',
+      components: [
+        'contact'
+      ]
     }
   ]
 }

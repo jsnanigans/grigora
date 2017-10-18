@@ -433,7 +433,7 @@ grigora.prototype.apply = function (compiler) {
         this.generatePages(_ => {})
       }
 
-      this.compilation.fileDependencies.push(path.join(__dirname, './src/routes.js'))
+      this.compilation.fileDependencies.push(path.join(__dirname, './src/pages.js'))
       this.watchFiles()
       callback()
     })
