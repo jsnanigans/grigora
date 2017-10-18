@@ -3,7 +3,7 @@ const path = require('path')
 // const ejs = require('ejs')
 // const handlebars = require('handlebars')
 const ECT = require('ect')
-const componentsPath = './src/components/'
+const componentsPath = './src/05_components/'
 var assets = []
 
 let cacheAge = 1.2e+6 // 20 minutes
@@ -55,9 +55,55 @@ function grigora (options) {
   this.config = {}
   this.relatedFiles = []
 
-  this.readModuleTemplate = (path, callback) => {
+  let incTemplateRegex = /\{\{+(add) '+(.*)'\}\}/g
+
+  this.parseAssetPath = assetPath => {
+    let basePath = path.join(__dirname, 'src')
+    let rt = false
+    // console.log(basePath + '04_' + assetPath)
+
+    if (assetPath.indexOf('layouts') === 0) {
+      rt = basePath + '/04_' + assetPath
+    }
+    if (assetPath.indexOf('parts') === 0) {
+      rt = basePath + '/03_' + assetPath
+    }
+
+    if (rt) {
+      this.relatedFiles.push(rt)
+      this.watchFiles()
+    }
+    return rt
+  }
+
+  // resolve custom includes and replace with the tempalte
+  this.includeTemplates = template => {
+    let match
+    do {
+      match = incTemplateRegex.exec(template)
+      if (match) {
+        let snippet = match[0]
+        let assetPath = match[2]
+        if (assetPath.indexOf('.html') === -1) {
+          assetPath += '/default.html'
+        }
+
+        let resolvedPath = this.parseAssetPath(assetPath)
+        try {
+          let fileContent = fs.readFileSync(resolvedPath, 'utf8')
+          template = template.replace(snippet, fileContent)
+        } catch (e) {
+          console.log('NOT FOUND: ' + assetPath)
+        }
+      }
+    } while (match)
+
+    return template
+  }
+
+  this.readModuleTemplate = (templatePath, callback) => {
     try {
-      var filename = require.resolve(path)
+      var filename = require.resolve(templatePath)
       if (fileCache[filename]) {
         callback(fileCache[fileCache])
       } else {
@@ -115,6 +161,8 @@ function grigora (options) {
     }
 
     let rendered = ''
+
+    body = this.includeTemplates(body)
     try {
       // rendered = ejs.render(body, seed)
       // let tmpl = handlebars.compile(body)
@@ -190,7 +238,6 @@ function grigora (options) {
           })
         })
       }
-
     } else {
       modulesDone(combinedHTML.join(''))
     }

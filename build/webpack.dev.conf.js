@@ -50,7 +50,7 @@ module.exports = merge(baseWebpackConfig, {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new grigora({
-      config: path.join(__dirname, '../src/routes.js')
+      config: path.join(__dirname, '../src/pages.js')
     }),
     // https://github.com/ampedandwired/html-webpack-plugin
     new FriendlyErrorsPlugin()

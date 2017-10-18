@@ -1,2 +1,3 @@
-require('@/components/image')
-require('./test.styl')
+require('components/image')
+
+require('./main.styl')

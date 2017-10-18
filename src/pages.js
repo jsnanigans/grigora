@@ -13,6 +13,7 @@ module.exports = {
       name: 'index',
       components: [
         'image',
+        'contact',
         'image',
         'image',
         'image',
