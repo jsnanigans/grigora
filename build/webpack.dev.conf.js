@@ -6,6 +6,7 @@ var path = require('path')
 var baseWebpackConfig = require('./webpack.base.conf')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
+// var WebpackMonitor = require('webpack-monitor')
 var grigora = require('../grigora')
 
 // add hot-reload related code to entry chunks
@@ -53,6 +54,12 @@ module.exports = merge(baseWebpackConfig, {
       config: path.join(__dirname, '../src/pages.js')
     }),
     // https://github.com/ampedandwired/html-webpack-plugin
-    new FriendlyErrorsPlugin()
+    new FriendlyErrorsPlugin(),
+    // new WebpackMonitor({
+    //   capture: true, // -> default 'true'
+    //   // target: '../monitor/myStatsStore.json', // default -> '../monitor/stats.json'
+    //   launch: true, // -> default 'false'
+    //   port: 3030, // default -> 8081
+    // })
   ]
 })

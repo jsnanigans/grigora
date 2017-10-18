@@ -1,0 +1,165 @@
+[
+  {
+    "timeStamp": 1508342829357,
+    "time": 2005,
+    "hash": "167521fae6c6bade56cd",
+    "errors": [],
+    "size": 343723,
+    "assets": [
+      {
+        "name": "main.js",
+        "chunks": [
+          0
+        ],
+        "size": 343723,
+        "miniSize": 338046,
+        "minified": false
+      }
+    ],
+    "chunks": [
+      {
+        "size": 118193,
+        "files": [
+          "main.js"
+        ],
+        "modules": [
+          {
+            "name": "./node_modules/css-loader!./node_modules/stylus-loader!./src/05_components/image/style/img.styl",
+            "size": 263,
+            "id": 0
+          },
+          {
+            "name": "./node_modules/css-loader!./node_modules/stylus-loader!./src/main.styl",
+            "size": 163,
+            "id": 1
+          },
+          {
+            "name": "./node_modules/html-entities/lib/html5-entities.js",
+            "size": 48986,
+            "id": 2
+          },
+          {
+            "name": "./node_modules/css-loader/lib/css-base.js",
+            "size": 2260,
+            "id": 3
+          },
+          {
+            "name": "./node_modules/style-loader/lib/addStyles.js",
+            "size": 9415,
+            "id": 4
+          },
+          {
+            "name": "multi ./build/dev-client ./src/main.js",
+            "size": 40,
+            "id": 5
+          },
+          {
+            "name": "./build/dev-client.js",
+            "size": 245,
+            "id": 6
+          },
+          {
+            "name": "./node_modules/eventsource-polyfill/dist/browserify-eventsource.js",
+            "size": 852,
+            "id": 7
+          },
+          {
+            "name": "./node_modules/eventsource-polyfill/dist/eventsource.js",
+            "size": 17742,
+            "id": 8
+          },
+          {
+            "name": "(webpack)-hot-middleware/client.js?noInfo=true&reload=true",
+            "size": 7044,
+            "id": 9
+          },
+          {
+            "name": "(webpack)/buildin/module.js",
+            "size": 517,
+            "id": 10
+          },
+          {
+            "name": "./node_modules/querystring-es3/index.js",
+            "size": 127,
+            "id": 11
+          },
+          {
+            "name": "./node_modules/querystring-es3/decode.js",
+            "size": 2510,
+            "id": 12
+          },
+          {
+            "name": "./node_modules/querystring-es3/encode.js",
+            "size": 2544,
+            "id": 13
+          },
+          {
+            "name": "./node_modules/strip-ansi/index.js",
+            "size": 161,
+            "id": 14
+          },
+          {
+            "name": "./node_modules/ansi-regex/index.js",
+            "size": 135,
+            "id": 15
+          },
+          {
+            "name": "(webpack)-hot-middleware/client-overlay.js",
+            "size": 1819,
+            "id": 16
+          },
+          {
+            "name": "./node_modules/ansi-html/index.js",
+            "size": 4263,
+            "id": 17
+          },
+          {
+            "name": "./node_modules/html-entities/index.js",
+            "size": 231,
+            "id": 18
+          },
+          {
+            "name": "./node_modules/html-entities/lib/xml-entities.js",
+            "size": 2993,
+            "id": 19
+          },
+          {
+            "name": "./node_modules/html-entities/lib/html4-entities.js",
+            "size": 6587,
+            "id": 20
+          },
+          {
+            "name": "(webpack)-hot-middleware/process-update.js",
+            "size": 3866,
+            "id": 21
+          },
+          {
+            "name": "./src/main.js",
+            "size": 53,
+            "id": 22
+          },
+          {
+            "name": "./src/05_components/image/index.js",
+            "size": 55,
+            "id": 23
+          },
+          {
+            "name": "./src/05_components/image/style/img.styl",
+            "size": 1187,
+            "id": 24
+          },
+          {
+            "name": "./node_modules/style-loader/lib/urls.js",
+            "size": 3008,
+            "id": 25
+          },
+          {
+            "name": "./src/main.styl",
+            "size": 1127,
+            "id": 26
+          }
+        ]
+      }
+    ]
+  }
+]

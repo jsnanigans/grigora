@@ -1,6 +1,3 @@
-let links = []
-links.length = 20
-
 module.exports = {
-  links
+  items: ['1', '2', '3']
 }

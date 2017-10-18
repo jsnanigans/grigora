@@ -1,6 +1,6 @@
 module.exports = {
   template: {
-    default: 'templates/default.html'
+    default: 'templates/default.ejs'
   },
   seed: {
     default: 'seeds/default.js'

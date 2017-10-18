@@ -1,10 +1,11 @@
 const fs = require('fs')
 const path = require('path')
-// const ejs = require('ejs')
+const ejs = require('ejs')
 // const handlebars = require('handlebars')
-const ECT = require('ect')
+// const ECT = require('ect')
 const componentsPath = './src/05_components/'
 var assets = []
+let fileEnding = '.ejs'
 
 let cacheAge = 1.2e+6 // 20 minutes
 // let cacheAge = 1000 // 20 minutes
@@ -29,7 +30,7 @@ let log = {
       console.log('=======')
       console.log(this.log)
       console.log('=======')
-    })
+    }, 200)
   }
 }
 
@@ -97,8 +98,8 @@ function grigora (options) {
       if (match) {
         let snippet = match[0]
         let assetPath = match[2]
-        if (assetPath.indexOf('.html') === -1) {
-          assetPath += '/default.html'
+        if (assetPath.indexOf(fileEnding) === -1) {
+          assetPath += '/default' + fileEnding
         }
 
         let resolvedPath = this.parseAssetPath(assetPath)
@@ -132,9 +133,9 @@ function grigora (options) {
   }
 
   this.readModuleTemplate = (templatePath, callback) => {
+    var filename = require.resolve(templatePath)
+    console.log(filename)
     try {
-      var filename = require.resolve(templatePath)
-
       if (fileCache[filename]) {
         callback(fileCache[filename])
       } else {
@@ -197,18 +198,18 @@ function grigora (options) {
 
     body = this.includeTemplatesRecursive(body, cacheName)
     try {
-      // rendered = ejs.render(body, seed)
       // let tmpl = handlebars.compile(body)
       // rendered = tmpl(seed)
 
       if (body) {
-        let renderer = ECT({
-          root: {
-            layout: '<% content %>',
-            page: body
-          }
-        })
-        rendered = renderer.render('page', seed)
+        rendered = ejs.render(body, seed)
+        // let renderer = ECT({
+        //   root: {
+        //     layout: '<% content %>',
+        //     page: body
+        //   }
+        // })
+        // rendered = renderer.render('page', seed)
         log.add('cache created')
         componentCache[cacheName] = [now, rendered]
       } else {
@@ -297,7 +298,7 @@ function grigora (options) {
 
       let rt = {
         name: comp,
-        srcFile: base + '/templates/default.html',
+        srcFile: base + '/templates/default' + fileEnding,
         seedFile: base + '/seeds/default.js'
       }
 
@@ -341,7 +342,7 @@ function grigora (options) {
     })
 
     this.renderComponents(componentsObjects, (allHTML) => {
-      fs.writeFile(path.join(__dirname, './dist/') + name + '.' + (options.fileEnding || '.html'), allHTML, 'utf8', _ => {})
+      fs.writeFile(path.join(__dirname, './dist/') + name + '.' + (options.fileEnding || fileEnding), allHTML, 'utf8', _ => {})
       log.add('page done ' + name + ' - ' + (Date.now() - pageStart) + 'ms')
       pageDone()
     })
