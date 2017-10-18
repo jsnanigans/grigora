@@ -64,7 +64,7 @@ function dropCache (name) {
   })
 }
 
-function grigora (options) {
+function perigrine (options) {
   // this.options = options
   this.configFile = options.config || false
   this.config = {}
@@ -134,7 +134,6 @@ function grigora (options) {
 
   this.readModuleTemplate = (templatePath, callback) => {
     var filename = require.resolve(templatePath)
-    console.log(filename)
     try {
       if (fileCache[filename]) {
         callback(fileCache[filename])
@@ -302,7 +301,7 @@ function grigora (options) {
         seedFile: base + '/seeds/default.js'
       }
 
-      let configPath = base + '/config.grigora.js'
+      let configPath = base + '/config.perigrine.js'
       if (fs.existsSync(configPath)) {
         if (this.relatedFiles.indexOf(configPath) === -1 && configPath !== '' && configPath) {
           this.relatedFiles.push(configPath)
@@ -376,7 +375,7 @@ function grigora (options) {
   this.initial = true
 }
 
-grigora.prototype.apply = function (compiler) {
+perigrine.prototype.apply = function (compiler) {
   this.distPath = compiler.options.output.path
   compiler.plugin('emit', function (compilation, callback) {
     // console.log(compilation.assets)
@@ -440,4 +439,4 @@ grigora.prototype.apply = function (compiler) {
   }.bind(this))
 }
 
-module.exports = grigora
+module.exports = perigrine
