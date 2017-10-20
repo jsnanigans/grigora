@@ -1,6 +1,9 @@
 const fs = require('fs')
 const path = require('path')
 const ejs = require('ejs')
+
+const tidy = require('htmltidy').tidy
+
 // const handlebars = require('handlebars')
 // const ECT = require('ect')
 const componentsPath = './src/05_components/'
@@ -367,9 +370,19 @@ function peregrine (options) {
         distPath += pageOpts.name + '/'
       }
 
-      fs.writeFile(distPath + 'index.' + fileExtension, allHTML, 'utf8', _ => {})
 
       log.add('page done ' + name + ' - ' + (Date.now() - pageStart) + 'ms')
+
+      tidy(allHTML, {
+        doctype: 'html5',
+        indent: true
+      }, (err, html) => {
+        if (err) {
+          console.log('error writing file', distPath)
+          return
+        }
+        fs.writeFile(distPath + 'index.' + fileExtension, html, 'utf8', _ => {})
+      })
       pageDone()
     })
   }

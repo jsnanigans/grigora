@@ -2603,6 +2603,10 @@ htmlparser2@~3.3.0:
     domutils "1.1"
     readable-stream "1.0"
 
+htmltidy@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/htmltidy/-/htmltidy-0.0.6.tgz#1074e2b8ef1ac5aad1e16c3cb1478cf229989d68"
+
 http-errors@1.6.2, http-errors@~1.6.2:
   version "1.6.2"
   resolved "https://registry.yarnpkg.com/http-errors/-/http-errors-1.6.2.tgz#0a002cc85707192a7e7946ceedc11155f60ec736"
