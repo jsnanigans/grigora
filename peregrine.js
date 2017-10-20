@@ -8,7 +8,7 @@ const tidy = require('htmltidy').tidy
 // const ECT = require('ect')
 const componentsPath = './src/05_components/'
 var assets = []
-let fileEnding = '.ejs'
+let fileExtension = '.ejs'
 
 let cacheAge = 1.2e+6 // 20 minutes
 // let cacheAge = 1000 // 20 minutes
@@ -89,17 +89,18 @@ function peregrine (options) {
   this.config = {}
   this.relatedFiles = []
 
-  let incTemplateRegex = /\{\{+(add) '+(.*)'\}\}/g
+  let layoutTemplateRegex = /\{\{+(layout) '+(.*)'\}\}/g
+  let partTemplateRegex = /\{\{+(part) '+(.*)'\}\}/g
 
   this.parseAssetPath = assetPath => {
     let basePath = path.join(__dirname, 'src')
     let rt = false
 
-    if (assetPath.indexOf('layouts') === 0) {
-      rt = basePath + '/04_' + assetPath
+    if (assetPath.indexOf('layout') === 0) {
+      rt = basePath + '/04_layouts'
     }
-    if (assetPath.indexOf('parts') === 0) {
-      rt = basePath + '/03_' + assetPath
+    if (assetPath.indexOf('part') === 0) {
+      rt = basePath + '/03_parts'
     }
 
     if (rt) {
@@ -110,18 +111,26 @@ function peregrine (options) {
   }
 
   // resolve custom includes and replace with the tempalte
-  this.includeTemplates = (template, cacheName) => {
+  this.includeLayouts = (template, cacheName) => {
     let match
     do {
-      match = incTemplateRegex.exec(template)
+      match = layoutTemplateRegex.exec(template)
       if (match) {
         let snippet = match[0]
-        let assetPath = match[2]
-        if (assetPath.indexOf(fileEnding) === -1) {
-          assetPath += '/default' + fileEnding
+        let assetPath = match[1]
+        let layoutName = match[2]
+
+        if (layoutName.indexOf(fileExtension) === -1) {
+          assetPath += '/default' + fileExtension
         }
 
-        let resolvedPath = this.parseAssetPath(assetPath)
+        let resolvedPath = this.parseAssetPath(assetPath) + '/' + layoutName
+
+        if (layoutName.indexOf('/') === -1) {
+          resolvedPath += '/default' + fileExtension
+        } else {
+          resolvedPath += fileExtension
+        }
 
         if (typeof componentAssets[resolvedPath] === 'undefined') {
           componentAssets[resolvedPath] = []
@@ -134,7 +143,46 @@ function peregrine (options) {
           let fileContent = fs.readFileSync(resolvedPath, 'utf8')
           template = template.replace(snippet, fileContent)
         } catch (e) {
-          console.log('NOT FOUND: ' + assetPath)
+          console.log('NOT FOUND: ' + assetPath, resolvedPath)
+        }
+      }
+    } while (match)
+
+    return template
+  }
+  this.includeParts = (template, cacheName) => {
+    let match
+    do {
+      match = partTemplateRegex.exec(template)
+      if (match) {
+        let snippet = match[0]
+        let assetPath = match[1]
+        let layoutName = match[2]
+
+        if (layoutName.indexOf(fileExtension) === -1) {
+          assetPath += '/default' + fileExtension
+        }
+
+        let resolvedPath = this.parseAssetPath(assetPath) + '/' + layoutName
+
+        if (layoutName.indexOf('/') === -1) {
+          resolvedPath += '/default' + fileExtension
+        } else {
+          resolvedPath += fileExtension
+        }
+
+        if (typeof componentAssets[resolvedPath] === 'undefined') {
+          componentAssets[resolvedPath] = []
+        }
+        if (componentAssets[resolvedPath].indexOf(cacheName) === -1) {
+          componentAssets[resolvedPath].push(cacheName)
+        }
+
+        try {
+          let fileContent = fs.readFileSync(resolvedPath, 'utf8')
+          template = template.replace(snippet, fileContent)
+        } catch (e) {
+          console.log('NOT FOUND: ' + assetPath, resolvedPath)
         }
       }
     } while (match)
@@ -145,8 +193,9 @@ function peregrine (options) {
   this.includeTemplatesRecursive = (template, cacheName) => {
     let tmp = template
 
-    tmp = this.includeTemplates(tmp, cacheName)
-    tmp = this.includeTemplates(tmp, cacheName)
+    tmp = this.includeLayouts(tmp, cacheName)
+    tmp = this.includeParts(tmp, cacheName)
+    // tmp = this.includeTemplates(tmp, cacheName)
 
     return tmp
   }
@@ -302,7 +351,6 @@ function peregrine (options) {
             compHTML += '\n<!-- Component END: "' + comp.name + '" -->\n'
 
             combinedHTML[index] = compHTML
-            console.log(compHTML)
             compsDone++
             if (compsDone === compsTotal) {
               modulesDone(combinedHTML.join(''))
@@ -331,7 +379,7 @@ function peregrine (options) {
 
       let rt = {
         name: comp,
-        srcFile: base + '/templates/default' + fileEnding,
+        srcFile: base + '/templates/default' + fileExtension,
         seedFile: base + '/seeds/default.js'
       }
 
