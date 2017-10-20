@@ -13,15 +13,26 @@ module.exports = {
     {
       index: true,
       components: [
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image',
+        'image'
+      ]
+    },
+    {
+      name: 'contact',
+      components: [
+        'image',
         'contact'
       ]
     }
-    // {
-    //   name: 'contact',
-    //   components: [
-    //     'image',
-    //     'contact'
-    //   ]
-    // }
   ]
 }
