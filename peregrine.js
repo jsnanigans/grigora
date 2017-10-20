@@ -262,7 +262,7 @@ function peregrine (options) {
   this.renderComponents = (componentsObjects, modulesDone) => {
     let combinedHTML = []
     let comps = componentsObjects
-    let sync = false
+    let sync = true
 
     let compsDone = 0
     let compsTotal = comps.length
@@ -271,7 +271,11 @@ function peregrine (options) {
       if (!sync) {
         // sync components
         let compCallback = rendered => {
-          log.add('start')
+          // Comment before
+          // let commentBefore = '\n<!-- Component START: ' + JSON.stringify(comp) + ' -->\n'
+          // let commentAfter = '\n<!-- Component END: ' + JSON.stringify(comp) + ' -->\n'
+
+          // combinedHTML[compsDone] = commentBefore + rendered + commentAfter
           combinedHTML[compsDone] = rendered
           compsDone++
 
@@ -285,9 +289,20 @@ function peregrine (options) {
       } else {
         // async compile
         comps.forEach((comp, index) => {
-          log.add('start')
           this.renderSingleComponent(comp, rendered => {
-            combinedHTML[index] = rendered
+            let compHTML = ''
+            // Comment before
+            compHTML = '<!-- Component START: "' + comp.name + '"' +
+              ' Template: ' + comp.srcFile.split('05_components/')[1] + '' +
+              ' Seed: ' + comp.seedFile.split('05_components/')[1] + '' +
+               ' -->\n'
+            // Add rendered string
+            compHTML += rendered
+            // Comment after
+            compHTML += '\n<!-- Component END: "' + comp.name + '" -->\n'
+
+            combinedHTML[index] = compHTML
+            console.log(compHTML)
             compsDone++
             if (compsDone === compsTotal) {
               modulesDone(combinedHTML.join(''))
@@ -369,7 +384,6 @@ function peregrine (options) {
         }
         distPath += pageOpts.name + '/'
       }
-
 
       log.add('page done ' + name + ' - ' + (Date.now() - pageStart) + 'ms')
 
