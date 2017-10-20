@@ -1,6 +1,7 @@
 module.exports = {
   options: {
     fileEnding: 'html',
+
     beforeEach: {
       components: ['_head']
     },
@@ -10,15 +11,21 @@ module.exports = {
   },
   pages: [
     {
-      name: 'index',
+      index: true,
       components: [
         'image',
-        'contact',
         'image',
         'image',
         'image',
         'image',
         'image'
+      ]
+    },
+    {
+      name: 'contact',
+      components: [
+        'image',
+        'contact'
       ]
     }
   ]

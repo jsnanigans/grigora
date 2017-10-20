@@ -14,6 +14,22 @@ const componentCache = {}
 const componentAssets = {}
 const fileCache = {}
 
+const deleteFolderRecursive = function (path) {
+  var files = []
+  if (fs.existsSync(path)) {
+    files = fs.readdirSync(path)
+    files.forEach(function (file, index) {
+      var curPath = path + '/' + file
+      if (fs.lstatSync(curPath).isDirectory()) { // recurse
+        deleteFolderRecursive(curPath)
+      } else { // delete file
+        fs.unlinkSync(curPath)
+      }
+    })
+    // fs.rmdirSync(path)
+  }
+}
+
 let log = {
   log: '',
   clear: _ => {
@@ -282,7 +298,7 @@ function peregrine (options) {
   }
 
   this.generatePage = (pageOpts, options, pageDone) => {
-    const name = pageOpts.name
+    const name = pageOpts.name || 'index'
 
     log.add('start page: ' + name)
     let pageStart = Date.now()
@@ -341,7 +357,18 @@ function peregrine (options) {
     })
 
     this.renderComponents(componentsObjects, (allHTML) => {
-      fs.writeFile(path.join(__dirname, './dist/') + name + '.' + (options.fileEnding || fileEnding), allHTML, 'utf8', _ => {})
+      let distPath = path.join(__dirname, './dist/')
+      let fileExtension = (options.fileExtension || 'html')
+
+      if (pageOpts.index !== true) {
+        if (!fs.existsSync(distPath + pageOpts.name)) {
+          fs.mkdirSync(distPath + pageOpts.name)
+        }
+        distPath += pageOpts.name + '/'
+      }
+
+      fs.writeFile(distPath + 'index.' + fileExtension, allHTML, 'utf8', _ => {})
+
       log.add('page done ' + name + ' - ' + (Date.now() - pageStart) + 'ms')
       pageDone()
     })
@@ -375,6 +402,7 @@ function peregrine (options) {
   this.initial = true
 }
 
+let initialBuild = true
 peregrine.prototype.apply = function (compiler) {
   this.distPath = compiler.options.output.path
   compiler.plugin('emit', function (compilation, callback) {
@@ -393,10 +421,14 @@ peregrine.prototype.apply = function (compiler) {
       log.clear()
       if (err) throw err
 
-      for (const file of files) {
-        fs.unlinkSync(path.join(directory, file), err => {
-          console.error('error unlinking - ' + path.join(directory, file) + ' - ' + err)
-        })
+      if (initialBuild) {
+        initialBuild = false
+        deleteFolderRecursive(directory)
+        // for (const file of files) {
+        //   fs.unlinkSync(path.join(directory, file), err => {
+        //     console.error('error unlinking - ' + path.join(directory, file) + ' - ' + err)
+        //   })
+        // }
       }
 
       var changedFiles = Object.keys(compilation.fileTimestamps).filter(function (watchfile) {
