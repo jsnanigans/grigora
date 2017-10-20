@@ -142,6 +142,10 @@ function peregrine (options) {
         try {
           let fileContent = fs.readFileSync(resolvedPath, 'utf8')
           template = template.replace(snippet, fileContent)
+
+          if (this.relatedFiles.indexOf(resolvedPath) === -1) {
+            this.relatedFiles.push(resolvedPath)
+          }
         } catch (e) {
           console.log('NOT FOUND: ' + assetPath, resolvedPath)
         }
@@ -181,6 +185,10 @@ function peregrine (options) {
         try {
           let fileContent = fs.readFileSync(resolvedPath, 'utf8')
           template = template.replace(snippet, fileContent)
+
+          if (this.relatedFiles.indexOf(resolvedPath) === -1) {
+            this.relatedFiles.push(resolvedPath)
+          }
         } catch (e) {
           console.log('NOT FOUND: ' + assetPath, resolvedPath)
         }
