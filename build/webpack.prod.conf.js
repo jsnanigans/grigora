@@ -8,7 +8,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
-var perigrine = require('../perigrine')
+var peregrine = require('../peregrine')
 
 var env = process.env.NODE_ENV === 'testing'
   ? require('../config/test.env')
@@ -28,8 +28,8 @@ var webpackConfig = merge(baseWebpackConfig, {
     chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
   },
   plugins: [
-    new perigrine({
-      config: path.join(__dirname, '/perigrine.js')
+    new peregrine({
+      config: path.join(__dirname, '/peregrine.js')
     }),
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({

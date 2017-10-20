@@ -1,7 +1,7 @@
-# perigrine
+# peregrine
 > Static site generator with webpack
 
-![Dependencies](https://david-dm.org/jsnanigans/perigrine.svg)
+![Dependencies](https://david-dm.org/jsnanigans/peregrine.svg)
 
 ## Build Setup
 ``` bash
@@ -43,7 +43,7 @@ module.exports = {
 ```
 
 # Options
-To configure perigrine, change `options` in `routes.js`
+To configure peregrine, change `options` in `routes.js`
 
 ### fileEnding
 > define the file ending of the template files that are created

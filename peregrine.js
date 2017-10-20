@@ -64,7 +64,7 @@ function dropCache (name) {
   })
 }
 
-function perigrine (options) {
+function peregrine (options) {
   // this.options = options
   this.configFile = options.config || false
   this.config = {}
@@ -301,7 +301,7 @@ function perigrine (options) {
         seedFile: base + '/seeds/default.js'
       }
 
-      let configPath = base + '/config.perigrine.js'
+      let configPath = base + '/peregrine.config.js'
       if (fs.existsSync(configPath)) {
         if (this.relatedFiles.indexOf(configPath) === -1 && configPath !== '' && configPath) {
           this.relatedFiles.push(configPath)
@@ -375,7 +375,7 @@ function perigrine (options) {
   this.initial = true
 }
 
-perigrine.prototype.apply = function (compiler) {
+peregrine.prototype.apply = function (compiler) {
   this.distPath = compiler.options.output.path
   compiler.plugin('emit', function (compilation, callback) {
     // console.log(compilation.assets)
@@ -439,4 +439,4 @@ perigrine.prototype.apply = function (compiler) {
   }.bind(this))
 }
 
-module.exports = perigrine
+module.exports = peregrine
