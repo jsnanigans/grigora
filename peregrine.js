@@ -46,9 +46,9 @@ let log = {
   },
   print: _ => {
     setTimeout(_ => {
-      console.log('=======')
-      console.log(this.log)
-      console.log('=======')
+      // console.log('=======')
+      // console.log(this.log)
+      // console.log('=======')
     }, 200)
   }
 }
@@ -235,12 +235,16 @@ function peregrine (options) {
 
   let insertAssets = html => {
     if (html.indexOf('{{insert_assets}}') !== -1) {
-      let assetSources = ''
+      let assetSources = []
       assets.forEach(asset => {
-        assetSources += '<script type="text/javascript" src="' + asset + '"></script>'
+        if (asset.indexOf('.map') === -1) {
+          assetSources.push('<script type="text/javascript" src="' + asset + '"></script>')
+        }
       })
 
-      html = html.replace('{{insert_assets}}', assetSources)
+      assetSources.reverse()
+
+      html = html.replace('{{insert_assets}}', assetSources.join(''))
     }
 
     return html

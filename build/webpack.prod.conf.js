@@ -16,10 +16,30 @@ var env = process.env.NODE_ENV === 'testing'
 
 var webpackConfig = merge(baseWebpackConfig, {
   module: {
-    rules: utils.styleLoaders({
-      sourceMap: config.build.productionSourceMap,
-      extract: true
-    })
+    rules: [
+      {
+        test: /\.scss$/,
+        // include: [resolve('src'), resolve('test')],
+        use: [{
+            loader: "style-loader" // creates style nodes from JS strings
+        }, {
+            loader: "css-loader" // translates CSS into CommonJS
+        }, {
+            loader: "sass-loader" // compiles Sass to CSS
+        }]
+      },
+      {
+        test: /\.styl$/,
+        // include: [resolve('src'), resolve('test')],
+        use: [{
+            loader: "style-loader" // creates style nodes from JS strings
+        }, {
+            loader: "css-loader" // translates CSS into CommonJS
+        }, {
+            loader: "stylus-loader" // compiles stylus to CSS
+        }]
+      },
+    ]
   },
   devtool: config.build.productionSourceMap ? '#source-map' : false,
   output: {
@@ -29,7 +49,8 @@ var webpackConfig = merge(baseWebpackConfig, {
   },
   plugins: [
     new peregrine({
-      config: path.join(__dirname, '/peregrine.js')
+      // config: path.join(__dirname, '/../peregrine.js')
+      config: path.join(__dirname, '../src/pages.js')
     }),
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
@@ -72,6 +93,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     //   chunksSortMode: 'dependency'
     // }),
     // split vendor js into its own file
+
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
       minChunks: function (module, count) {
@@ -85,6 +107,7 @@ var webpackConfig = merge(baseWebpackConfig, {
         )
       }
     }),
+
     // extract webpack runtime and module manifest to its own file in order to
     // prevent vendor hash from being updated whenever app bundle is updated
     new webpack.optimize.CommonsChunkPlugin({
