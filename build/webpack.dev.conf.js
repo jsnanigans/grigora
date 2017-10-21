@@ -37,7 +37,14 @@ module.exports = merge(baseWebpackConfig, {
             loader: "css-loader" // translates CSS into CommonJS
         }, {
             loader: "stylus-loader" // compiles stylus to CSS
-        }]
+        },
+        {
+          loader: 'stylus-vars-loader',
+          options: {
+            file: './src/01_variables/index.styl',
+          }
+        }
+      ]
       },
     ]
   },

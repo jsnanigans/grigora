@@ -1,7 +1,11 @@
 <form action="demo">
-  <% for (let i = 0; i < inputs.length; i++) {  %>
-    floof {{part 'form_inputs/text'}}
-  <% }; %>
+  <div class="grid">
+    <% for (let i = 0; i < inputs.length; i++) {  %>
+      <div class="col">
+        {{part 'form_inputs/text'}}
+      </div>
+    <% }; %>
+  </div>
 
-  {{part 'form_inputs/button'}}
+  <!-- {{part 'form_inputs/button'}} -->
 </form>

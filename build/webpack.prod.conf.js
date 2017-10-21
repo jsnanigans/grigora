@@ -26,28 +26,22 @@ var webpackConfig = merge(baseWebpackConfig, {
           fallback: 'style-loader',
           use: ['css-loader', 'sass-loader']
         })
-        // use: [{
-        //     loader: "style-loader" // creates style nodes from JS strings
-        // }, {
-        //     loader: "css-loader" // translates CSS into CommonJS
-        // }, {
-        //     loader: "sass-loader" // compiles Sass to CSS
-        // }]
       },
       {
         test: /\.styl$/,
         use: ExtractTextPlugin.extract({
           fallback: 'style-loader',
-          use: ['css-loader', 'stylus-loader']
+          use: [
+            'css-loader',
+            'stylus-loader',
+            {
+              loader: 'stylus-vars-loader',
+              options: {
+                file: './src/01_variables/index.styl',
+              }
+            }
+          ]
         })
-        // include: [resolve('src'), resolve('test')],
-        // use: [{
-        //     loader: "style-loader" // creates style nodes from JS strings
-        // }, {
-        //     loader: "css-loader" // translates CSS into CommonJS
-        // }, {
-        //     loader: "stylus-loader" // compiles stylus to CSS
-        // }]
       },
     ]
   },
