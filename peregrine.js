@@ -234,17 +234,30 @@ function peregrine (options) {
   this.prevTimestamps = {}
 
   let insertAssets = html => {
-    if (html.indexOf('{{insert_assets}}') !== -1) {
+    if (html.indexOf('{{insert_scripts}}') !== -1) {
       let assetSources = []
       assets.forEach(asset => {
-        if (asset.indexOf('.map') === -1) {
+        if (asset.endsWith('.js')) {
           assetSources.push('<script type="text/javascript" src="' + asset + '"></script>')
         }
       })
 
       assetSources.reverse()
 
-      html = html.replace('{{insert_assets}}', assetSources.join(''))
+      html = html.replace('{{insert_scripts}}', assetSources.join(''))
+    }
+
+    if (html.indexOf('{{insert_styles}}') !== -1) {
+      let assetSources = []
+      assets.forEach(asset => {
+        if (asset.endsWith('.css')) {
+          assetSources.push('<link rel="stylesheet" href="' + asset + '" />')
+        }
+      })
+
+      assetSources.reverse()
+
+      html = html.replace('{{insert_styles}}', assetSources.join(''))
     }
 
     return html
@@ -510,7 +523,7 @@ peregrine.prototype.apply = function (compiler) {
 
       if (initialBuild) {
         initialBuild = false
-        deleteFolderRecursive(directory)
+        // deleteFolderRecursive(directory)
         // for (const file of files) {
         //   fs.unlinkSync(path.join(directory, file), err => {
         //     console.error('error unlinking - ' + path.join(directory, file) + ' - ' + err)
