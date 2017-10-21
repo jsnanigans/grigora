@@ -1,7 +1,13 @@
-// jeet.gutter = 1
+// $jeet.gutter = 10
 
 form
   .grid
     center(1000px)
+    column(2/3)
   .col
+    padding: 0 5px
     span(1/2)
+    &:nth-child(3)
+      span(1/1)
+    // +below(m)
+    //   span(1/1)

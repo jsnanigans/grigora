@@ -4366,6 +4366,10 @@ run-async@^2.2.0:
   dependencies:
     is-promise "^2.1.0"
 
+rupture@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/rupture/-/rupture-0.6.2.tgz#ef4eee91711ff7af64e37f544cfc60a5c08319d3"
+
 rx-lite-aggregates@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/rx-lite-aggregates/-/rx-lite-aggregates-4.0.8.tgz#753b87a89a11c95467c4ac1626c4efc4e05c67be"

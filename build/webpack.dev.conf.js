@@ -51,10 +51,21 @@ module.exports = merge(baseWebpackConfig, {
   // cheap-module-eval-source-map is faster for development
   devtool: '#cheap-module-eval-source-map',
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env': config.dev.env
+    new webpack.LoaderOptionsPlugin({
+      test: /\.styl$/,
+      stylus: {
+        // You can have multiple stylus configs with other names and use them
+        // with `stylus-loader?config=otherConfig`.
+        default: {
+          use: [
+            require('rupture')()
+          ],
+        },
+        otherConfig: {
+          // use: [other_plugin()],
+        },
+      },
     }),
-    // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new peregrine({

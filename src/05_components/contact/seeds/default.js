@@ -1,5 +1,5 @@
 let inputs = []
-inputs.length = 5
+inputs.length = 7
 module.exports = {
   inputs
 }
