@@ -458,10 +458,10 @@ function peregrine (options) {
       let fileExtension = (options.fileExtension || 'html')
 
       if (pageOpts.index !== true) {
-        if (!fs.existsSync(distPath + pageOpts.name)) {
-          fs.mkdirSync(distPath + pageOpts.name)
+        if (!fs.existsSync(distPath + pageOpts.route)) {
+          fs.mkdirSync(distPath + pageOpts.route)
         }
-        distPath += pageOpts.name + '/'
+        distPath += pageOpts.route + '/'
       }
 
       log.add('page done ' + name + ' - ' + (Date.now() - pageStart) + 'ms')

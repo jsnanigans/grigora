@@ -6,7 +6,7 @@ module.exports = {
         name: 'Home'
       },
       {
-        slug: '/contact',
+        slug: '/coqntact',
         name: 'Contact'
       }
     ]
@@ -25,6 +25,7 @@ module.exports = {
   pages: [
     {
       index: true,
+      name: 'Home',
       components: [
         'image',
         'image',
@@ -41,7 +42,8 @@ module.exports = {
       ]
     },
     {
-      name: 'contact',
+      route: 'coqntact',
+      name: 'Contact',
       components: [
         'image',
         'contact'
