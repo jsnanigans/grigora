@@ -9,6 +9,7 @@ const tidy = require('htmltidy').tidy
 const componentsPath = './src/05_components/'
 var assets = []
 let fileExtension = '.ejs'
+let globalSeed = {}
 
 let cacheAge = 1.2e+6 // 20 minutes
 // let cacheAge = 1000 // 20 minutes
@@ -227,6 +228,10 @@ function peregrine (options) {
   this.loadConfig = _ => {
     if (this.configFile) {
       this.config = require(this.configFile)
+      // console.log(this.config)
+      if (this.config.globalSeed) {
+        globalSeed = this.config.globalSeed
+      }
     }
   }
 
@@ -294,6 +299,7 @@ function peregrine (options) {
       // rendered = tmpl(seed)
 
       if (body) {
+        seed = Object.assign({}, globalSeed, seed)
         rendered = ejs.render(body, seed)
         // let renderer = ECT({
         //   root: {

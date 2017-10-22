@@ -1,9 +1,22 @@
 module.exports = {
+  globalSeed: {
+    navigation: [
+      {
+        slug: '',
+        name: 'Home'
+      },
+      {
+        slug: '/contact',
+        name: 'Contact'
+      }
+    ]
+  },
+
   options: {
     fileEnding: 'html',
 
     beforeEach: {
-      components: ['_head']
+      components: ['_head', 'navigation']
     },
     afterEach: {
       components: ['_foot']
