@@ -58,7 +58,8 @@ module.exports = merge(baseWebpackConfig, {
         // with `stylus-loader?config=otherConfig`.
         default: {
           use: [
-            require('rupture')()
+            require('rupture')(),
+            // require('typographic')()
           ],
         },
         otherConfig: {
