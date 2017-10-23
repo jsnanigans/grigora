@@ -1,8 +1,10 @@
 const fs = require('fs')
 const path = require('path')
 const ejs = require('ejs')
-
+const SHA256 = require('crypto-js/sha256')
 const tidy = require('htmltidy').tidy
+
+let logEnabled = false
 
 // const handlebars = require('handlebars')
 // const ECT = require('ect')
@@ -47,9 +49,11 @@ let log = {
   },
   print: _ => {
     setTimeout(_ => {
-      // console.log('=======')
-      // console.log(this.log)
-      // console.log('=======')
+      if (logEnabled) {
+        console.log('=======')
+        console.log(this.log)
+        console.log('=======')
+      }
     }, 200)
   }
 }
@@ -327,7 +331,12 @@ function peregrine (options) {
     log.add('start module ' + modID)
     this.readModuleTemplate(comp.srcFile, body => {
       let cacheName = comp.srcFile + '++' + comp.seedFile
-      let rendered = renderTemplate(body, comp.seedData, cacheName)
+      let seed = Object.assign({}, comp.seedData, comp.addComponentSeed)
+      let seedString = JSON.stringify(seed)
+      let hash = SHA256(seedString).words.join('')
+
+      let rendered = renderTemplate(body, seed, cacheName + '--' + hash)
+
       log.add('fin module ' + modID + ' - ' + (Date.now() - modStart + 'ms'))
       rendered = insertAssets(rendered)
 
@@ -405,11 +414,23 @@ function peregrine (options) {
 
     let components = prepend.concat(pageOpts.components).concat(append)
 
+    // generate componentsObjects
     let componentsObjects = components.map(comp => {
-      let base = path.join(__dirname, componentsPath) + comp
+      let name = comp
+      let addComponentSeed = {}
+
+      if (typeof comp === 'object') {
+        name = comp.name
+        if (comp.seed) {
+          addComponentSeed = comp.seed
+        }
+      }
+
+      let base = path.join(__dirname, componentsPath) + name
 
       let rt = {
-        name: comp,
+        name,
+        addComponentSeed,
         srcFile: base + '/templates/default' + fileExtension,
         seedFile: base + '/seeds/default.js'
       }

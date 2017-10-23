@@ -28,7 +28,12 @@ module.exports = {
       name: 'Home',
       components: [
         'image',
-        'image',
+        {
+          name: 'image',
+          seed: {
+            items: ['unos', 'dos', 'tres']
+          }
+        },
         'image',
         'image',
         'image',
