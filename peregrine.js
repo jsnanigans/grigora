@@ -2,13 +2,11 @@ const fs = require('fs')
 const path = require('path')
 const ejs = require('ejs')
 const rimraf = require('rimraf')
-const SHA256 = require('crypto-js/sha256')
+const encrypt = require('crypto-js/md5')
 const tidy = require('htmltidy').tidy
 
 let logEnabled = false
 
-// const handlebars = require('handlebars')
-// const ECT = require('ect')
 const componentsPath = './src/05_components/'
 var assets = []
 let fileExtension = '.ejs'
@@ -20,11 +18,6 @@ let cacheAge = 1.2e+6 // 20 minutes
 const componentCache = {}
 const componentAssets = {}
 const fileCache = {}
-
-const deleteFolderRecursive = function (path) {
-  // console.log('delete', path)
-  // shell.rm('-rf', path)
-}
 
 let log = {
   log: '',
@@ -323,7 +316,7 @@ function peregrine (options) {
       let cacheName = comp.srcFile + '++' + comp.seedFile
       let seed = Object.assign({}, comp.seedData, comp.addComponentSeed)
       let seedString = JSON.stringify(seed)
-      let hash = SHA256(seedString).words.join('')
+      let hash = encrypt(seedString, 'secret').words.join('')
 
       let rendered = renderTemplate(body, seed, cacheName + '--' + hash)
 
