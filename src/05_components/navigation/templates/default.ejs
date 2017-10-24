@@ -1,7 +1,7 @@
 <div class="navigation">
   <nav>
     <ul>
-      <% navigation.forEach(item => { %>
+      <% generatedNavigation.main.forEach(item => { %>
         <li><a href="<%= item.slug || '/' %>"><%= item.name %></a></li>
       <% }) %>
     </ul>

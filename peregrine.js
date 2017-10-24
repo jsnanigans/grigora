@@ -218,6 +218,23 @@ function peregrine (options) {
       // console.log(this.config)
       if (this.config.globalSeed) {
         globalSeed = this.config.globalSeed
+
+        let genNavs = {}
+        this.config.pages.map(page => {
+          if (page.navigation) {
+            if (!genNavs[page.navigation]) {
+              genNavs[page.navigation] = []
+            }
+
+            genNavs[page.navigation].push({
+              name: page.name,
+              slug: page.index ? '/' : page.route
+            })
+          }
+        })
+
+        globalSeed.generatedNavigation = genNavs
+        // console.log(this.config.pages)
       }
     }
   }
@@ -282,19 +299,10 @@ function peregrine (options) {
 
     body = this.includeTemplatesRecursive(body, cacheName)
     try {
-      // let tmpl = handlebars.compile(body)
-      // rendered = tmpl(seed)
-
       if (body) {
         seed = Object.assign({}, globalSeed, seed)
         rendered = ejs.render(body, seed)
-        // let renderer = ECT({
-        //   root: {
-        //     layout: '<% content %>',
-        //     page: body
-        //   }
-        // })
-        // rendered = renderer.render('page', seed)
+
         log.add('cache created')
         componentCache[cacheName] = [now, rendered]
       } else {

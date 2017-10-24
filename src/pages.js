@@ -17,7 +17,7 @@ module.exports = {
     {
       index: true,
       name: 'Home',
-      inNavigation: true,
+      navigation: 'main',
       components: [
         'image',
         {
@@ -41,7 +41,7 @@ module.exports = {
     {
       route: 'contact',
       name: 'Contact',
-      inNavigation: true,
+      navigation: 'main',
       components: [
         'image',
         'contact'
@@ -49,7 +49,7 @@ module.exports = {
     },
     {
       route: 'secret',
-      inNavigation: false,
+      navigation: 'footer',
       components: [
         'image'
       ]
