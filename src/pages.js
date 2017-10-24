@@ -1,15 +1,6 @@
 module.exports = {
   globalSeed: {
-    navigation: [
-      {
-        slug: '',
-        name: 'Home'
-      },
-      {
-        slug: '/coqntact',
-        name: 'Contact'
-      }
-    ]
+    navigation: []
   },
 
   options: {
@@ -26,6 +17,7 @@ module.exports = {
     {
       index: true,
       name: 'Home',
+      inNavigation: true,
       components: [
         'image',
         {
@@ -47,11 +39,19 @@ module.exports = {
       ]
     },
     {
-      route: 'coqntact',
+      route: 'contact',
       name: 'Contact',
+      inNavigation: true,
       components: [
         'image',
         'contact'
+      ]
+    },
+    {
+      route: 'secret',
+      inNavigation: false,
+      components: [
+        'image'
       ]
     }
   ]

@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const ejs = require('ejs')
+const rimraf = require('rimraf')
 const SHA256 = require('crypto-js/sha256')
 const tidy = require('htmltidy').tidy
 
@@ -21,19 +22,8 @@ const componentAssets = {}
 const fileCache = {}
 
 const deleteFolderRecursive = function (path) {
-  var files = []
-  if (fs.existsSync(path)) {
-    files = fs.readdirSync(path)
-    files.forEach(function (file, index) {
-      var curPath = path + '/' + file
-      if (fs.lstatSync(curPath).isDirectory()) { // recurse
-        deleteFolderRecursive(curPath)
-      } else { // delete file
-        fs.unlinkSync(curPath)
-      }
-    })
-    // fs.rmdirSync(path)
-  }
+  // console.log('delete', path)
+  // shell.rm('-rf', path)
 }
 
 let log = {
@@ -542,6 +532,9 @@ peregrine.prototype.apply = function (compiler) {
     let directory = path.join(__dirname, './dist')
     if (!fs.existsSync(directory)) {
       fs.mkdirSync(directory)
+    } else {
+      // deleteFolderRecursive(directory)
+      // fs.mkdirSync(directory)
     }
 
     fs.readdir(directory, (err, files) => {
@@ -551,6 +544,10 @@ peregrine.prototype.apply = function (compiler) {
       if (initialBuild) {
         initialBuild = false
         // deleteFolderRecursive(directory)
+        if (fs.existsSync(directory)) {
+          rimraf.sync(directory)
+          fs.mkdirSync(directory)
+        }
         // for (const file of files) {
         //   fs.unlinkSync(path.join(directory, file), err => {
         //     console.error('error unlinking - ' + path.join(directory, file) + ' - ' + err)
