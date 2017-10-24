@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const ejs = require('ejs')
-const rimraf = require('rimraf')
+const shell = require('shelljs')
 const encrypt = require('crypto-js/md5')
 const tidy = require('htmltidy').tidy
 
@@ -215,7 +215,6 @@ function peregrine (options) {
   this.loadConfig = _ => {
     if (this.configFile) {
       this.config = require(this.configFile)
-      // console.log(this.config)
       if (this.config.globalSeed) {
         globalSeed = this.config.globalSeed
 
@@ -234,7 +233,6 @@ function peregrine (options) {
         })
 
         globalSeed.generatedNavigation = genNavs
-        // console.log(this.config.pages)
       }
     }
   }
@@ -546,7 +544,8 @@ peregrine.prototype.apply = function (compiler) {
         initialBuild = false
         // deleteFolderRecursive(directory)
         if (fs.existsSync(directory)) {
-          rimraf.sync(directory)
+          // rimraf(directory)
+          shell.rm('-rf', directory)
           fs.mkdirSync(directory)
         }
         // for (const file of files) {

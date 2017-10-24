@@ -56,6 +56,22 @@ var webpackConfig = merge(baseWebpackConfig, {
       // config: path.join(__dirname, '/../peregrine.js')
       config: path.join(__dirname, '../src/pages.js')
     }),
+    new webpack.LoaderOptionsPlugin({
+      test: /\.styl$/,
+      stylus: {
+        // You can have multiple stylus configs with other names and use them
+        // with `stylus-loader?config=otherConfig`.
+        default: {
+          use: [
+            require('rupture')(),
+            // require('typographic')()
+          ],
+        },
+        otherConfig: {
+          // use: [other_plugin()],
+        },
+      },
+    }),
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
       'process.env': env
@@ -135,7 +151,7 @@ var webpackConfig = merge(baseWebpackConfig, {
       // Give paths to parse for rules. These should be absolute!
       paths: glob.sync([
         path.join(__dirname, '../src/**/*.js'),
-        path.join(__dirname, '../src/**/*.ejs')
+        path.join(__dirname, '../dist/**/*.html')
       ]),
     }),
   ]
