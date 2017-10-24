@@ -9,7 +9,7 @@ input[type='submit']
 	background-color: $color.primary
 	border: .1rem solid $color.primary
 	border-radius: .4rem
-	color: $color.initial
+	color: $color.light
 	cursor: pointer
 	display: inline-block
 	font-size: 1.2rem
@@ -22,12 +22,13 @@ input[type='submit']
 	text-decoration: none
 	text-transform: uppercase
 	white-space: nowrap
+	transition: background, color
 
 	&:focus,
 	&:hover
 		background-color: $color.secondary
 		border-color: $color.secondary
-		color: $color.initial
+		color: $color.light
 		outline: 0
 
 	&[disabled]
@@ -71,4 +72,4 @@ input[type='submit']
 
 			&:focus,
 			&:hover
-				color: color-primary
+				color: $color.primary
