@@ -1,11 +1,17 @@
 const fs = require('fs')
 const path = require('path')
 const ejs = require('ejs')
-const shell = require('shelljs')
+// const shell = require('shelljs')
+const rimraf = require('rimraf')
 const encrypt = require('crypto-js/md5')
 const tidy = require('htmltidy').tidy
 
 let logEnabled = false
+let showErrors = false
+
+if (process.env.NODE_ENV === 'development') {
+  showErrors = true
+}
 
 const componentsPath = './src/05_components/'
 var assets = []
@@ -207,7 +213,11 @@ function peregrine (options) {
     if (fs.existsSync(templatePath)) {
       var filename = require.resolve(templatePath)
     } else {
-      callback(errorText)
+      if (showErrors) {
+        callback(errorText)
+      } else {
+        callback()
+      }
       return
     }
     try {
@@ -319,8 +329,6 @@ function peregrine (options) {
 
         log.add('cache created')
         componentCache[cacheName] = [now, rendered]
-      } else {
-        console.log('body is ', body)
       }
     } catch (e) {
       console.log(e)
@@ -335,6 +343,10 @@ function peregrine (options) {
     let modStart = Date.now()
     log.add('start module ' + modID)
     this.readModuleTemplate(comp.srcFile, body => {
+      if (!body) {
+        body = ''
+      }
+
       let cacheName = comp.srcFile + '++' + comp.seedFile
       let seed = Object.assign({}, comp.seedData, comp.addComponentSeed)
       let seedString = JSON.stringify(seed)
@@ -452,7 +464,7 @@ function peregrine (options) {
       let seedFileExists = fs.existsSync(rt.seedFile)
 
       if (!tmpFileExists) {
-        console.log('\'' + rt.srcFile + '\'', 'was not found')
+        console.log('\n\'' + rt.srcFile + '\'', 'was not found')
       }
 
       rt.seedData = fs.existsSync(rt.seedFile) ? require(rt.seedFile) : false
@@ -487,7 +499,8 @@ function peregrine (options) {
           console.log('error writing file', distPath)
           return
         }
-        fs.writeFile(distPath + 'index.' + fileExtension, html, 'utf8', _ => {})
+        let writeFile = distPath + 'index.' + fileExtension
+        fs.writeFile(writeFile, html, 'utf8', _ => {})
       })
       pageDone()
     })
@@ -525,7 +538,6 @@ let initialBuild = true
 peregrine.prototype.apply = function (compiler) {
   this.distPath = compiler.options.output.path
   compiler.plugin('emit', function (compilation, callback) {
-    // console.log(compilation.assets)
     assets = []
     Object.keys(compilation.assets).forEach(key => {
       assets.push('/' + key)
@@ -547,8 +559,8 @@ peregrine.prototype.apply = function (compiler) {
         initialBuild = false
         // deleteFolderRecursive(directory)
         if (fs.existsSync(directory)) {
-          // rimraf(directory)
-          shell.rm('-rf', directory)
+          rimraf.sync(directory)
+          // shell.rm('-rf', directory)
           fs.mkdirSync(directory)
         }
         // for (const file of files) {
