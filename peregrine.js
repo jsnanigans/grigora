@@ -421,35 +421,7 @@ function peregrine (options) {
         name,
         addComponentSeed,
         srcFile: base + '/templates/default' + fileExtension,
-        seedFile: base + '/seeds/default.js'
-      }
-
-      let configPath = base + '/peregrine.config.js'
-      if (fs.existsSync(configPath)) {
-        if (this.relatedFiles.indexOf(configPath) === -1 && configPath !== '' && configPath) {
-          this.relatedFiles.push(configPath)
-        }
-        let conf = {}
-        try {
-          conf = require(configPath)
-        } catch (e) {
-          console.log('error reading: ' + configPath)
-        }
-
-        if (conf.template) {
-          if (conf.template.default) {
-            rt.srcFile = base + '/' + conf.template.default
-          } else {
-            rt.srcFile = base + '/templates/' + conf.template
-          }
-        }
-        if (conf.seed) {
-          if (conf.seed.default) {
-            rt.seedFile = base + '/' + conf.seed.default
-          } else {
-            rt.seedFile = base + '/seeds/' + conf.seed
-          }
-        }
+        seedFile: base + '/seed.default.js'
       }
 
       rt.seedData = fs.existsSync(rt.seedFile) ? require(rt.seedFile) : false
