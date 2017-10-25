@@ -19,9 +19,10 @@ module.exports = {
       name: 'Home',
       navigation: 'main',
       components: [
+        'navigation/buttons',
         'image',
         {
-          name: 'image',
+          component: 'image',
           seed: {
             items: ['unos', 'dos', 'tres']
           }

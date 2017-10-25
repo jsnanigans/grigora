@@ -406,13 +406,20 @@ function peregrine (options) {
     // generate componentsObjects
     let componentsObjects = components.map(comp => {
       let name = comp
+      let variant = 'default'
       let addComponentSeed = {}
 
       if (typeof comp === 'object') {
-        name = comp.name
+        name = comp.component
         if (comp.seed) {
           addComponentSeed = comp.seed
         }
+      }
+
+      if (name.indexOf('/') !== -1) {
+        let nameSplit = name.split('/')
+        name = nameSplit[0]
+        variant = nameSplit[nameSplit.length - 1]
       }
 
       let base = path.join(__dirname, componentsPath) + name
@@ -420,7 +427,7 @@ function peregrine (options) {
       let rt = {
         name,
         addComponentSeed,
-        srcFile: base + '/templates/default' + fileExtension,
+        srcFile: base + '/templates/' + variant + fileExtension,
         seedFile: base + '/seed.default.js'
       }
 

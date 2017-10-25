@@ -1,0 +1,7 @@
+<div class="navigation">
+  <nav>
+    <% generatedNavigation.main.forEach(item => { %>
+      <a class="button" href="<%= item.slug || '/' %>"><%= item.name %></a>
+    <% }) %>
+  </nav>
+</div>
