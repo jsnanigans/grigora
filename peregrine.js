@@ -243,7 +243,7 @@ function peregrine (options) {
 
             genNavs[page.navigation].push({
               name: page.name,
-              slug: page.index ? '/' : page.route
+              slug: page.index ? '/' : '/' + page.route
             })
           }
         })
