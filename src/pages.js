@@ -27,11 +27,13 @@ module.exports = {
             items: ['unos', 'dos', 'tres']
           }
         },
-        'image',
-        'image',
-        'image',
-        'image',
-        'image',
+        {
+          component: 'image/small',
+          seed: {
+            items: 'abcdefghijklmnopqrstuvxyz'.split('')
+          }
+        },
+        'image/placeholder',
         'image',
         'image',
         'image',

@@ -197,14 +197,30 @@ function peregrine (options) {
   }
 
   this.readModuleTemplate = (templatePath, callback) => {
-    var filename = require.resolve(templatePath)
+    let errorText = `
+    <div style="margin:10px;padding:10px;background:#fff;color:#e00;font-size:16px;border:2px solid black;">
+      Component Template: <br />
+      <b>"${templatePath}"</b><br />
+      could not be found.
+    </div>`
+
+    if (fs.existsSync(templatePath)) {
+      var filename = require.resolve(templatePath)
+    } else {
+      callback(errorText)
+      return
+    }
     try {
       if (fileCache[filename]) {
         callback(fileCache[filename])
       } else {
-        let fileContent = fs.readFileSync(filename, 'utf8')
-        fileCache[filename] = fileContent
-        callback(fileContent)
+        try {
+          let fileContent = fs.readFileSync(filename, 'utf8')
+          fileCache[filename] = fileContent
+          callback(fileContent)
+        } catch (e) {
+          callback(errorText)
+        }
       }
     } catch (e) {
       // callback(e)
@@ -431,11 +447,19 @@ function peregrine (options) {
         seedFile: base + '/seed.default.js'
       }
 
+      // check if template file exists
+      let tmpFileExists = fs.existsSync(rt.srcFile)
+      let seedFileExists = fs.existsSync(rt.seedFile)
+
+      if (!tmpFileExists) {
+        console.log('\'' + rt.srcFile + '\'', 'was not found')
+      }
+
       rt.seedData = fs.existsSync(rt.seedFile) ? require(rt.seedFile) : false
-      if (this.relatedFiles.indexOf(rt.srcFile) === -1 && rt.srcFile !== '' && rt.srcFile) {
+      if (tmpFileExists && this.relatedFiles.indexOf(rt.srcFile) === -1 && rt.srcFile !== '' && rt.srcFile) {
         this.relatedFiles.push(rt.srcFile)
       }
-      if (fs.existsSync(rt.seedFile) && this.relatedFiles.indexOf(rt.seedFile) === -1 && rt.seedFile !== '' && rt.seedFile) {
+      if (seedFileExists && this.relatedFiles.indexOf(rt.seedFile) === -1 && rt.seedFile !== '' && rt.seedFile) {
         this.relatedFiles.push(rt.seedFile)
       }
 
