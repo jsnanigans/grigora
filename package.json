@@ -26,7 +26,7 @@
     "jquery": "^3.2.1",
     "normalize.css": "^7.0.0",
     "purify-css": "^1.2.5",
-    "purifycss-webpack": "^0.7.0",
+    "purifycss-webpack": "git+ssh://git@github.com:jsnanigans/purifycss-webpack.git",
     "rupture": "^0.6.2",
     "style-loader": "^0.19.0",
     "stylus": "^0.54.5",

@@ -4040,9 +4040,9 @@ purify-css@^1.2.5:
     uglify-js "^3.0.6"
     yargs "^8.0.1"
 
-purifycss-webpack@^0.7.0:
+"purifycss-webpack@git+ssh://git@github.com:jsnanigans/purifycss-webpack.git":
   version "0.7.0"
-  resolved "https://registry.yarnpkg.com/purifycss-webpack/-/purifycss-webpack-0.7.0.tgz#07c9ce7988f608f1928102ed3ff19178ce38f0e0"
+  resolved "git+ssh://git@github.com:jsnanigans/purifycss-webpack.git#760b50c4369fcf63628df9cd7641446c9d5543db"
   dependencies:
     ajv "^4.11.2"
     webpack-sources "^0.1.4"
