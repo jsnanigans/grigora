@@ -534,11 +534,30 @@ function peregrine (options) {
   this.initial = true
 }
 
+function simpleStringify (object) {
+  var simpleObject = {}
+  for (var prop in object) {
+    if (!object.hasOwnProperty(prop)) {
+      continue
+    }
+    if (typeof (object[prop]) === 'object') {
+      continue
+    }
+    if (typeof (object[prop]) === 'function') {
+      continue
+    }
+    simpleObject[prop] = object[prop]
+  }
+  return JSON.stringify(simpleObject) // returns cleaned up JSON
+};
+
 let initialBuild = true
 peregrine.prototype.apply = function (compiler) {
   this.distPath = compiler.options.output.path
+
   compiler.plugin('emit', function (compilation, callback) {
     assets = []
+
     Object.keys(compilation.assets).forEach(key => {
       assets.push('/' + key)
     })
@@ -557,17 +576,12 @@ peregrine.prototype.apply = function (compiler) {
 
       if (initialBuild) {
         initialBuild = false
-        // deleteFolderRecursive(directory)
+        // delete dist repository
         if (fs.existsSync(directory)) {
           rimraf.sync(directory)
           // shell.rm('-rf', directory)
           fs.mkdirSync(directory)
         }
-        // for (const file of files) {
-        //   fs.unlinkSync(path.join(directory, file), err => {
-        //     console.error('error unlinking - ' + path.join(directory, file) + ' - ' + err)
-        //   })
-        // }
       }
 
       var changedFiles = Object.keys(compilation.fileTimestamps).filter(function (watchfile) {

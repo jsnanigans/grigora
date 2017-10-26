@@ -12,6 +12,44 @@ const glob = require('glob-all')
 const PurifyCSSPlugin = require('purifycss-webpack')
 var peregrine = require('../peregrine')
 
+
+let jsModules = []
+let allModules = []
+function listModules(options) {}
+listModules.prototype.apply = function(compiler) {
+  // Setup callback for accessing a compilation:
+  compiler.plugin("emit", function(compilation, cb) {
+    let modules = {}
+
+    compilation.modules.map(mod => {
+      let res = mod.resource
+      let ext = res.split('.')
+        ext = ext[ext.length - 1]
+
+      if (!modules[ext]) {
+        modules[ext] = []
+      }
+
+      allModules.push(res)
+      modules[ext].push(res)
+    })
+
+    jsModules = modules.js
+
+    if (typeof cb === 'function') {
+      cb()
+    }
+  })
+}
+
+let filePaths = glob.sync([
+  path.join(__dirname, '../dist/**/*.html')
+])
+let getFilePaths = _ => {
+  console.log(allModules)
+  return filePaths
+}
+
 var env = process.env.NODE_ENV === 'testing'
   ? require('../config/test.env')
   : config.build.env
@@ -52,6 +90,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
   },
   plugins: [
+    new listModules(),
     new peregrine({
       // config: path.join(__dirname, '/../peregrine.js')
       config: path.join(__dirname, '../src/pages.js')
@@ -149,10 +188,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     // delete unused css
     new PurifyCSSPlugin({
       // Give paths to parse for rules. These should be absolute!
-      paths: glob.sync([
-        path.join(__dirname, '../src/**/*.js'),
-        path.join(__dirname, '../dist/**/*.html')
-      ]),
+      paths: getFilePaths()
     }),
   ]
 })
