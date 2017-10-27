@@ -1,8 +1,10 @@
-<div class="navigation">
-  <nav>
-    <ul>
+<div class="nav--container">
+  <nav class="nav">
+    <ul class="nav__list">
       <% generatedNavigation.main.forEach(item => { %>
-        <li><a href="<%= item.slug || '/' %>"><%= item.name %></a></li>
+        <li class="nav__list__item">
+          <a href="<%= item.slug || '/' %>" class="nav__link"><%= item.name %></a>
+        </li>
       <% }) %>
     </ul>
   </nav>

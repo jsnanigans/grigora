@@ -1,0 +1,48 @@
+$height = 100px
+$spacing = 20px
+
+.nav
+  position: fixed
+  top: 0
+  right: 0
+  left: 0
+  height: $height
+  background: $color.light
+
+  &--container
+    margin-top: $height
+
+  &__list
+    margin: 0
+    list-style: none
+    display: block
+    float: right
+    line-height: $height
+    padding-right: $spacing
+
+    &__item
+      display: inline-block
+      position: relative
+
+      &::before
+        content: ''
+        display: block
+        height: $spacing
+        left: 100%
+        width: 1px
+        position: absolute
+        background: $color.primary
+        top: 50%
+        transform: translate(2px, -50%)
+
+      &:last-child
+        &::before
+          content: none
+
+  &__link
+    padding: $spacing * 0.6 $spacing
+    text-transform: uppercase
+    text-decoration none
+    font-size: 14px
+    letter-spacing: 0.03em
+    transition: color

@@ -19,7 +19,7 @@ module.exports = {
       name: 'Home',
       navigation: 'main',
       components: [
-        'navigation/buttons',
+        // 'navigation/buttons',
         'image',
         {
           component: 'image',
