@@ -29,26 +29,7 @@ module.exports = merge(baseWebpackConfig, {
         }]
       },
       {
-        // test: /\.styl$/,
-        test: /^(?:(?!\.critical).)*\.styl$/,
-        // include: [resolve('src'), resolve('test')],
-        use: [{
-              loader: "style-loader" // creates style nodes from JS strings
-          }, {
-              loader: "css-loader" // translates CSS into CommonJS
-          }, {
-              loader: "stylus-loader" // compiles stylus to CSS
-          },
-          {
-            loader: 'stylus-vars-loader',
-            options: {
-              file: './src/01_variables/index.styl',
-            }
-          }
-        ]
-      },
-      {
-        test: /(.critical)\.js$/,
+        test: /\.styl$/,
         // include: [resolve('src'), resolve('test')],
         use: [{
               loader: "style-loader" // creates style nodes from JS strings

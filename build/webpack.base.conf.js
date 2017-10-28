@@ -8,7 +8,7 @@ function resolve (dir) {
 
 module.exports = {
   entry: {
-    main: './src/main.js'
+    main: './src/main.js',
   },
   output: {
     path: config.build.assetsRoot,
@@ -18,7 +18,7 @@ module.exports = {
       : config.dev.assetsPublicPath
   },
   resolve: {
-    extensions: ['.js', '.ejs', '.json'],
+    extensions: ['.js', '.ejs', '.json', '.styl'],
     alias: {
       '@': resolve('src'),
       'variables': resolve('src/01_variables'),
