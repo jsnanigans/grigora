@@ -12,8 +12,8 @@ const glob = require('glob-all')
 const PurifyCSSPlugin = require('purifycss-webpack')
 var peregrine = require('../peregrine')
 
-const ExtractNormalCSS = new ExtractTextPlugin('css/styles.[contenthash].css')
-const ExtractCriticalCSS = new ExtractTextPlugin('css/crit.[contenthash].css')
+const Extract = new ExtractTextPlugin('css/[name].[contenthash].css')
+// const ExtractCriticalCSS = new ExtractTextPlugin('css/crit.[contenthash].css')
 
 
 let jsModules = []
@@ -59,26 +59,9 @@ var webpackConfig = merge(baseWebpackConfig, {
         })
       },
       {
-        // test: /^(?:(?!\.crit).)*\.styl$/,
-        // test: /\.styl$/,
-        test: /(?:(?!\.crit).)*\.styl$/,
-        use: ExtractNormalCSS.extract({
-          fallback: 'style-loader',
-          use: [
-            'css-loader',
-            'stylus-loader',
-            {
-              loader: 'stylus-vars-loader',
-              options: {
-                file: './src/01_variables/index.styl',
-              }
-            }
-          ]
-        })
-      },
-      {
-        test: /\.crit\.styl$/,
-        use: ExtractCriticalCSS.extract({
+        // test: /(?:(?!\.crit).)*\.styl$/,
+        test: /\.styl$/,
+        use: Extract.extract({
           fallback: 'style-loader',
           use: [
             'css-loader',
@@ -136,8 +119,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     // new ExtractTextPlugin({
     //   filename: utils.assetsPath('css/[name].[contenthash].css')
     // }),
-    ExtractCriticalCSS,
-    ExtractNormalCSS,
+    Extract,
 
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.

@@ -6,4 +6,3 @@ require('layouts/demo_form')
 // components included
 
 require('components/image')
-require('components/navigation')

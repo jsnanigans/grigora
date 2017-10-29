@@ -9,6 +9,7 @@ function resolve (dir) {
 module.exports = {
   entry: {
     main: './src/main.js',
+    crit: './src/crit.js'
   },
   output: {
     path: config.build.assetsRoot,
