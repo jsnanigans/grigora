@@ -36,6 +36,12 @@ listModules.prototype.apply = function(compiler) {
   })
 }
 
+let assetPaths = []
+const getFilePaths = _ => {
+  console.log('assetPaths', assetPaths)
+  return assetPaths
+}
+
 var env = process.env.NODE_ENV === 'testing'
   ? require('../config/test.env')
   : config.build.env
@@ -80,7 +86,10 @@ var webpackConfig = merge(baseWebpackConfig, {
     // new listModules(),
     new peregrine({
       // config: path.join(__dirname, '/../peregrine.js')
-      config: path.join(__dirname, '../src/pages.js')
+      config: path.join(__dirname, '../src/pages.js'),
+      setPaths: paths => {
+        assetPaths = paths
+      }
     }),
     new webpack.LoaderOptionsPlugin({
       test: /\.styl$/,
@@ -174,11 +183,11 @@ var webpackConfig = merge(baseWebpackConfig, {
     ]),
 
     // delete unused css
-    // new PurifyCSSPlugin({
-    //   // Give paths to parse for rules. These should be absolute!
-    //   paths: getFilePaths(),
-    //   modulePathsTest: 'src.*\.(js)$'
-    // }),
+    new PurifyCSSPlugin({
+      // Give paths to parse for rules. These should be absolute!
+      paths: getFilePaths(),
+      modulePathsTest: 'src.*\.(js)$'
+    }),
   ]
 })
 

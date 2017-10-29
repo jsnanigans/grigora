@@ -17,6 +17,8 @@ const componentsPath = './src/05_components/'
 let fileExtension = '.ejs'
 let globalSeed = {}
 
+let usedTemplates = []
+
 let cacheAge = 1.2e+6 // 20 minutes
 // let cacheAge = 1000 // 20 minutes
 
@@ -81,6 +83,10 @@ function peregrine (options) {
   this.configFile = options.config || false
   this.config = {}
   this.relatedFiles = []
+
+  if (options.setPaths) {
+    options.setPaths(usedTemplates)
+  }
 
   let layoutTemplateRegex = /\{\{+(layout) '+(.*)'\}\}/g
   let partTemplateRegex = /\{\{+(part) '+(.*)'\}\}/g
@@ -529,6 +535,7 @@ function peregrine (options) {
   }
 
   this.watchFiles = _ => {
+    this.compilation.fileDependencies.push(path.join(__dirname, './src/pages.js'))
     this.relatedFiles.forEach(file => {
       this.compilation.fileDependencies.push(file)
     })
@@ -556,22 +563,6 @@ function peregrine (options) {
   this.initial = true
 }
 
-function simpleStringify (object) {
-  var simpleObject = {}
-  for (var prop in object) {
-    if (!object.hasOwnProperty(prop)) {
-      continue
-    }
-    if (typeof (object[prop]) === 'object') {
-      continue
-    }
-    if (typeof (object[prop]) === 'function') {
-      continue
-    }
-    simpleObject[prop] = object[prop]
-  }
-  return JSON.stringify(simpleObject) // returns cleaned up JSON
-};
 
 let initialBuild = true
 peregrine.prototype.apply = function (compiler) {
@@ -626,16 +617,19 @@ peregrine.prototype.apply = function (compiler) {
 
       this.prevTimestamps = compilation.fileTimestamps
       this.compilation = compilation
+
       if (this.initial) {
         this.initial = false
 
         this.loadConfig()
-        this.generatePages(_ => {})
+        this.generatePages(_ => {
+          console.log('cb')
+          callback()
+        })
+      } else {
+        callback()
       }
-
-      this.compilation.fileDependencies.push(path.join(__dirname, './src/pages.js'))
       this.watchFiles()
-      callback()
     })
   }.bind(this))
 }
