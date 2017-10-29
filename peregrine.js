@@ -14,7 +14,6 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 const componentsPath = './src/05_components/'
-var assets = []
 let fileExtension = '.ejs'
 let globalSeed = {}
 
@@ -269,9 +268,17 @@ function peregrine (options) {
   let insertAssets = html => {
     if (html.indexOf('{{insert_scripts}}') !== -1) {
       let assetSources = []
-      assets.forEach(asset => {
-        if (asset.endsWith('.js')) {
-          assetSources.push('<script type="text/javascript" src="' + asset + '"></script>')
+
+      Object.keys(this.compilation.assets).forEach(file => {
+        let asset = this.compilation.assets[file]
+
+        if (file.endsWith('.js')) {
+          if (file.indexOf('crit.') === -1) {
+            assetSources.push('<script type="text/javascript" src="' + file + '"></script>')
+          } else {
+            let fileContent = asset._value
+            assetSources.push('<script type="text/javascript">' + fileContent + '</script>')
+          }
         }
       })
 
@@ -282,9 +289,24 @@ function peregrine (options) {
 
     if (html.indexOf('{{insert_styles}}') !== -1) {
       let assetSources = []
-      assets.forEach(asset => {
-        if (asset.endsWith('.css')) {
-          assetSources.push('<link rel="stylesheet" href="' + asset + '" />')
+      Object.keys(this.compilation.assets).forEach(file => {
+        let asset = this.compilation.assets[file]
+
+        if (file.endsWith('.css')) {
+          if (file.indexOf('crit.') === -1) {
+            assetSources.push(`
+            <script type="text/javascript">
+              let f = document.createElement('link');
+              f.rel = 'stylesheet';
+              f.href = '/${file}';
+              f.type = 'text/css';
+              document.getElementsByTagName('head')[0].appendChild(f);
+            </script>
+            `)
+          } else {
+            let fileContent = asset._value
+            assetSources.push('<style>' + fileContent + '</style>')
+          }
         }
       })
 
@@ -556,12 +578,6 @@ peregrine.prototype.apply = function (compiler) {
   this.distPath = compiler.options.output.path
 
   compiler.plugin('emit', function (compilation, callback) {
-    assets = []
-
-    Object.keys(compilation.assets).forEach(key => {
-      assets.push('/' + key)
-    })
-
     let directory = path.join(__dirname, './dist')
     if (!fs.existsSync(directory)) {
       fs.mkdirSync(directory)
