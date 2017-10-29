@@ -36,13 +36,6 @@ listModules.prototype.apply = function(compiler) {
   })
 }
 
-let filePaths = glob.sync([
-  path.join(__dirname, '../dist/**/*.html')
-])
-let getFilePaths = _ => {
-  return filePaths
-}
-
 var env = process.env.NODE_ENV === 'testing'
   ? require('../config/test.env')
   : config.build.env
@@ -181,11 +174,11 @@ var webpackConfig = merge(baseWebpackConfig, {
     ]),
 
     // delete unused css
-    new PurifyCSSPlugin({
-      // Give paths to parse for rules. These should be absolute!
-      paths: getFilePaths(),
-      modulePathsTest: 'src.*\.js$'
-    }),
+    // new PurifyCSSPlugin({
+    //   // Give paths to parse for rules. These should be absolute!
+    //   paths: getFilePaths(),
+    //   modulePathsTest: 'src.*\.(js)$'
+    // }),
   ]
 })
 
