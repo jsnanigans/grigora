@@ -1,1 +1,1 @@
-// require('./styles/main.crit.styl')
+require('./styles/main.crit.styl')
