@@ -89,7 +89,8 @@ var webpackConfig = merge(baseWebpackConfig, {
       config: path.join(__dirname, '../src/pages.js'),
       setPaths: paths => {
         assetPaths = paths
-      }
+      },
+      env: 'production'
     }),
     new webpack.LoaderOptionsPlugin({
       test: /\.styl$/,
@@ -183,11 +184,11 @@ var webpackConfig = merge(baseWebpackConfig, {
     ]),
 
     // delete unused css
-    new PurifyCSSPlugin({
-      // Give paths to parse for rules. These should be absolute!
-      paths: getFilePaths(),
-      modulePathsTest: 'src.*\.(js)$'
-    }),
+    // new PurifyCSSPlugin({
+    //   // Give paths to parse for rules. These should be absolute!
+    //   paths: getFilePaths(),
+    //   modulePathsTest: 'src.*\.(js)$'
+    // }),
   ]
 })
 

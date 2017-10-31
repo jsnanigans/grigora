@@ -70,7 +70,8 @@ module.exports = merge(baseWebpackConfig, {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new peregrine({
-      config: path.join(__dirname, '../src/pages.js')
+      config: path.join(__dirname, '../src/pages.js'),
+      env: 'development'
     }),
     // https://github.com/ampedandwired/html-webpack-plugin
     new FriendlyErrorsPlugin(),

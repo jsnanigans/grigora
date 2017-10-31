@@ -279,11 +279,11 @@ function peregrine (options) {
         let asset = this.compilation.assets[file]
 
         if (file.endsWith('.js')) {
-          if (file.indexOf('crit.') === -1) {
-            assetSources.push('<script type="text/javascript" src="' + file + '"></script>')
-          } else {
-            let fileContent = asset._value
+          if (file.indexOf('crit.') !== -1 && options.env === 'production') {
+            let fileContent = asset._value || asset.children[0]._value
             assetSources.push('<script type="text/javascript">' + fileContent + '</script>')
+          } else {
+            assetSources.push('<script type="text/javascript" src="' + file + '"></script>')
           }
         }
       })
@@ -544,6 +544,14 @@ function peregrine (options) {
   this.generatePages = done => {
     // gernerate pages
 
+    for (let key in this.compilation.assets) {
+      let asset = this.compilation.assets[key]
+      // console.log(asset)
+    }
+    // this.compilation.assets.forEach((asset) => {
+    //   console.log(asset)
+    // })
+
     const conf = this.config
     const options = conf.options || {}
     const pages = conf.pages || []
@@ -562,7 +570,6 @@ function peregrine (options) {
 
   this.initial = true
 }
-
 
 let initialBuild = true
 peregrine.prototype.apply = function (compiler) {
@@ -623,7 +630,6 @@ peregrine.prototype.apply = function (compiler) {
 
         this.loadConfig()
         this.generatePages(_ => {
-          console.log('cb')
           callback()
         })
       } else {
