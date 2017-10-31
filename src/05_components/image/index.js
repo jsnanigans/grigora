@@ -1,10 +1,8 @@
-import $ from 'jquery'
+// import $ from 'jquery'
 
 require('./style/img.styl')
 console.log('init image')
 
-$(_ => {
-  $('.js-image').on('click', function () {
-    $(this).addClass('color-red')
-  })
+document.querySelectorAll('.js-image').addEventListener('click', e => {
+  e.target.classList.indexOf('color-red') !== -1 ? e.target.classList.remove('color-red') : e.target.classList.add('color-red')
 })

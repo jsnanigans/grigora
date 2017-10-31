@@ -8,8 +8,8 @@ var CopyWebpackPlugin = require('copy-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+const MinifyPlugin = require('babel-minify-webpack-plugin')
 const glob = require('glob-all')
-const PurifyCSSPlugin = require('purifycss-webpack')
 var peregrine = require('../peregrine')
 
 const Extract = new ExtractTextPlugin('css/[name].[contenthash].css')
@@ -154,7 +154,7 @@ var webpackConfig = merge(baseWebpackConfig, {
 
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
-      chunks: ['jquery'],
+      chunks: [],
       minChunks: 2
       // minChunks: function (module, count) {
       //   // any required modules inside node_modules are extracted to vendor
@@ -182,6 +182,8 @@ var webpackConfig = merge(baseWebpackConfig, {
         ignore: ['.*']
       }
     ]),
+
+    new MinifyPlugin()
 
     // delete unused css
     // new PurifyCSSPlugin({
