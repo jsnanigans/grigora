@@ -75,3 +75,17 @@ options: {
   }
 }
 ```
+
+# Module options
+peregrine.options.js
+
+```javascript
+module.exports = {
+  cache: Boolean
+}
+```
+
+### cache
+> Defaule: true
+
+cache rendered component for next time it comes along in the build process
