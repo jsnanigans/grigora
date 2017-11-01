@@ -334,8 +334,14 @@ function peregrine (options) {
     })
   }
 
-  let renderTemplate = (body, seed, cacheName) => {
-    let cached = componentCache[cacheName] || [false, false]
+  let renderTemplate = (body, seed, cacheName, comp) => {
+    let useCacheIfExists = true
+
+    if (comp.options) {
+      useCacheIfExists = !!comp.options.cache
+    }
+
+    let cached = useCacheIfExists ? componentCache[cacheName] || [false, false] : false
     // let cached = [false, false]
     let now = Date.now()
 
@@ -356,7 +362,9 @@ function peregrine (options) {
         rendered = ejs.render(body, seed)
 
         log.add('cache created')
-        componentCache[cacheName] = [now, rendered]
+        if (useCacheIfExists) {
+          componentCache[cacheName] = [now, rendered]
+        }
       }
     } catch (e) {
       console.log(e)
@@ -380,7 +388,7 @@ function peregrine (options) {
       let seedString = JSON.stringify(seed)
       let hash = encrypt(seedString, 'secret').words.join('')
 
-      let rendered = renderTemplate(body, seed, cacheName + '--' + hash)
+      let rendered = renderTemplate(body, seed, cacheName + '--' + hash, comp)
 
       log.add('fin module ' + modID + ' - ' + (Date.now() - modStart + 'ms'))
       rendered = insertAssets(rendered)
@@ -484,8 +492,10 @@ function peregrine (options) {
         name,
         addComponentSeed,
         srcFile: base + '/templates/' + variant + fileExtension,
-        seedFile: base + '/seed.default.js'
+        seedFile: base + '/seed.default.js',
+        optionsFile: base + '/peregrine.options.js'
       }
+
 
       // check if template file exists
       let tmpFileExists = fs.existsSync(rt.srcFile)
@@ -493,6 +503,12 @@ function peregrine (options) {
 
       if (!tmpFileExists) {
         console.log('\n\'' + rt.srcFile + '\'', 'was not found')
+      }
+
+      rt.options = fs.existsSync(rt.optionsFile) ? require(rt.optionsFile) : false
+
+      if (rt.options) {
+        this.relatedFiles.push(rt.optionsFile)
       }
 
       rt.seedData = fs.existsSync(rt.seedFile) ? require(rt.seedFile) : false
