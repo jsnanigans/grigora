@@ -1,6 +1,9 @@
+const faker = require('faker')
+
 module.exports = {
   globalSeed: {
-    navigation: []
+    navigation: [],
+    faker
   },
 
   options: {
@@ -24,7 +27,11 @@ module.exports = {
         {
           component: 'image',
           seed: {
-            items: ['unos', 'dos', 'tres']
+            items: [
+              faker.name.findName(),
+              faker.name.findName(),
+              faker.name.findName()
+            ]
           }
         },
         {
