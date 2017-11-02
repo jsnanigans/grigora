@@ -27,6 +27,7 @@
     "jeet": "^7.2.0",
     "jquery": "^3.2.1",
     "normalize.css": "^7.0.0",
+    "purify": "^3.3.1",
     "purify-css": "^1.2.5",
     "rupture": "^0.6.2",
     "style-loader": "^0.19.0",

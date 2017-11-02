@@ -1,3 +1,4 @@
+const ConcatSource = require('webpack-sources')
 const fs = require('fs')
 const path = require('path')
 const ejs = require('ejs')
@@ -5,6 +6,7 @@ const ejs = require('ejs')
 const rimraf = require('rimraf')
 const encrypt = require('crypto-js/md5')
 const tidy = require('htmltidy').tidy
+const purify = require('purify')
 
 let logEnabled = false
 let showErrors = false
@@ -559,11 +561,6 @@ function peregrine (options) {
 
   this.generatePages = done => {
     // gernerate pages
-
-    for (let key in this.compilation.assets) {
-      let asset = this.compilation.assets[key]
-      // console.log(asset)
-    }
     // this.compilation.assets.forEach((asset) => {
     //   console.log(asset)
     // })
@@ -646,6 +643,29 @@ peregrine.prototype.apply = function (compiler) {
 
         this.loadConfig()
         this.generatePages(_ => {
+          // let contentFiles = []
+
+          // Object.keys(componentAssets).forEach(key => {
+          //   contentFiles.push(key)
+          // })
+          // Object.keys(compilation.assets).forEach(key => {
+          //   if (key.endsWith('.js')) {
+          //     contentFiles.push(key)
+          //   }
+          // })
+
+          // compilation.chunks.forEach(chunk => {
+          //   Object.keys(chunk).forEach(kk => {
+          //     // console.log(kk)
+          //   })
+
+          //   // console.log(chunk.files)
+
+          //   chunk.files.forEach(file => {
+          //     compilation.assets[file] = new ConcatSource(['quaalskjd haslk dhasljkdh alsjkdh lasjkdhlakjkkk'])
+          //   })
+          // })
+
           callback()
         })
       } else {
