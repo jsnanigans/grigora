@@ -285,7 +285,7 @@ function peregrine (options) {
             let fileContent = asset._value || asset.children[0]._value
             assetSources.push('<script type="text/javascript">' + fileContent + '</script>')
           } else {
-            assetSources.push('<script type="text/javascript" src="' + file + '"></script>')
+            assetSources.push('<script type="text/javascript" src="/' + file + '"></script>')
           }
         }
       })
