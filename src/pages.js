@@ -22,6 +22,7 @@ module.exports = {
       name: 'Home',
       navigation: 'main',
       components: [
+        'hero',
         // 'navigation/buttons',
         'image',
         {

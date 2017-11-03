@@ -24,3 +24,41 @@ pre,
 table,
 ul
 	margin-bottom: 2.5rem
+
+
+.p
+	$tmp = $layout.spacingBase
+
+	&-0
+		padding: 0
+
+	for size in (1..$layout.spacingSteps)
+		$tmp = $tmp * $layout.spacingMultiplyer
+
+		&a-{size}
+			padding: $tmp
+
+		for side in t l r b
+			if side == l
+				$pside = left
+			if side == r
+				$pside = right
+			if side == b
+				$pside = bottom
+			if side == t
+				$pside = top
+
+			&{side}-{size}
+				padding-{$pside}: $tmp
+
+		for dir in v h
+			if dir == v
+				$pside1 = top
+				$pside2 = bottom
+			if dir == h
+				$pside1 = left
+				$pside2 = right
+
+			&{dir}-{size}
+				padding-{$pside1}: $tmp
+				padding-{$pside2}: $tmp
