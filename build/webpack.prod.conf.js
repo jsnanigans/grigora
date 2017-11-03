@@ -50,6 +50,13 @@ var webpackConfig = merge(baseWebpackConfig, {
   module: {
     rules: [
       {
+        test: /\.css$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader']
+        })
+      },
+      {
         test: /\.scss$/,
         // include: [resolve('src'), resolve('test')],
         use: ExtractTextPlugin.extract({
