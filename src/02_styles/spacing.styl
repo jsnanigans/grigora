@@ -25,40 +25,47 @@ table,
 ul
 	margin-bottom: 2.5rem
 
+for mode in p m
 
-.p
-	$tmp = $layout.spacingBase
+	if mode == m
+		$attr = margin
+	if mode == p
+		$attr = padding
 
-	&-0
-		padding: 0
+	.{mode}
+		$tmp = 0
 
-	for size in (1..$layout.spacingSteps)
-		$tmp = $tmp * $layout.spacingMultiplyer
+		for size in (0..$layout.spacingSteps)
 
-		&a-{size}
-			padding: $tmp
+			if size == 1
+				$tmp = $layout.spacingBase
 
-		for side in t l r b
-			if side == l
-				$pside = left
-			if side == r
-				$pside = right
-			if side == b
-				$pside = bottom
-			if side == t
-				$pside = top
+			$tmp = $tmp * $layout.spacingMultiplyer
 
-			&{side}-{size}
-				padding-{$pside}: $tmp
+			&a-{size}
+				{$attr}: $tmp
 
-		for dir in v h
-			if dir == v
-				$pside1 = top
-				$pside2 = bottom
-			if dir == h
-				$pside1 = left
-				$pside2 = right
+			for side in t l r b
+				if side == l
+					$pside = left
+				if side == r
+					$pside = right
+				if side == b
+					$pside = bottom
+				if side == t
+					$pside = top
 
-			&{dir}-{size}
-				padding-{$pside1}: $tmp
-				padding-{$pside2}: $tmp
+				&{side}-{size}
+					{$attr}-{$pside}: $tmp
+
+			for dir in v h
+				if dir == v
+					$pside1 = top
+					$pside2 = bottom
+				if dir == h
+					$pside1 = left
+					$pside2 = right
+
+				&{dir}-{size}
+					{$attr}-{$pside1}: $tmp
+					{$attr}-{$pside2}: $tmp
