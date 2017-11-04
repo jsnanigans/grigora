@@ -1,3 +1,9 @@
+
+.row
+  &-flex
+    display: flex
+    flex-wrap: wrap
+
 .span
   for num in (1..$layout.cols)
     &-{num}
@@ -5,6 +11,10 @@
       display: block
       float: left
 
-.row
-  &-flex
-    display: flex
+  for scale in s m l xl xxl
+    +above('{scale}')
+      for num in (1..$layout.cols)
+        &-{num}\@{scale}
+          width: num * (100 / $layout.cols)%
+          display: block
+          float: left
