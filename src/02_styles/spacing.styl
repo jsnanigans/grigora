@@ -40,7 +40,7 @@ for mode in p m
 			if size == 1
 				$tmp = $layout.spacingBase
 
-			$tmp = $tmp * $layout.spacingMultiplyer
+			$tmp = round($tmp * $layout.spacingMultiplyer, 3)
 
 			&a-{size}
 				{$attr}: $tmp
