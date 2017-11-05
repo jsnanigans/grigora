@@ -1,13 +1,11 @@
 
 .row
-  &-flex
-    display: flex
-    flex-wrap: wrap
+  display: flex
+  flex-wrap: wrap
+  // &-flex
 
 +responsive()
   &span
     for num in (1..$layout.cols)
       &-{num}
         width: num * (100 / $layout.cols)%
-        display: block
-        float: left
