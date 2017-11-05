@@ -277,47 +277,54 @@ function peregrine (options) {
   this.startTime = Date.now()
   this.prevTimestamps = {}
 
-  let insertAssets = html => {
+  let insertAssets = (html, inline) => {
     if (html.indexOf('{{insert_scripts}}') !== -1) {
       let assetSources = []
 
       Object.keys(this.compilation.assets).forEach(file => {
-        let asset = this.compilation.assets[file]
+        // let asset = this.compilation.assets[file]
 
         if (file.endsWith('.js')) {
-          if (file.indexOf('crit.') !== -1 && options.env === 'production') {
-            let fileContent = asset._value || asset.children[0]._value
-            assetSources.push('<script type="text/javascript">' + fileContent + '</script>')
-          } else {
-            assetSources.push('<script type="text/javascript" src="/' + file + '"></script>')
-          }
+          // if (inline && file.indexOf('crit.') !== -1 && options.env === 'production') {
+          //   let fileContent = asset._value || asset.children[0]._value
+          //   assetSources.push('<script type="text/javascript">' + fileContent + '</script>')
+          // }
+          assetSources.push('<script type="text/javascript" async src="/' + file + '"></script>')
         }
       })
 
-      assetSources.reverse()
+      // assetSources.reverse()
 
       html = html.replace('{{insert_scripts}}', assetSources.join(''))
     }
 
     if (html.indexOf('{{insert_styles}}') !== -1) {
       let assetSources = []
-      Object.keys(this.compilation.assets).forEach(file => {
+      Object.keys(this.compilation.assets).forEach((file, i) => {
         let asset = this.compilation.assets[file]
 
         if (file.endsWith('.css')) {
-          if (file.indexOf('crit.') === -1) {
+          if (inline) {
+            let wait = 0
+            if (file.indexOf('crit.') !== -1) {
+              let fileContent = asset._value
+              assetSources.push('<style>' + fileContent + '</style>')
+              wait = 300
+            }
+
             assetSources.push(`
             <script type="text/javascript">
-              let f = document.createElement('link');
-              f.rel = 'stylesheet';
-              f.href = '/${file}';
-              f.type = 'text/css';
-              document.getElementsByTagName('head')[0].appendChild(f);
+              var f${i} = document.createElement('link');
+              f${i}.rel = 'stylesheet';
+              f${i}.href = '/${file}';
+              f${i}.type = 'text/css';
+              setTimeout(function() {
+                document.getElementsByTagName('head')[0].appendChild(f${i});
+              }, ${wait})
             </script>
             `)
           } else {
-            let fileContent = asset._value
-            assetSources.push('<style>' + fileContent + '</style>')
+            assetSources.push('<link rel="stylesheet" href="/' + file + '" />')
           }
         }
       })
@@ -397,7 +404,6 @@ function peregrine (options) {
       let rendered = renderTemplate(body, seed, cacheName + '--' + hash, comp)
 
       log.add('fin module ' + modID + ' - ' + (Date.now() - modStart + 'ms'))
-      rendered = insertAssets(rendered)
 
       if (rtfn) {
         rtfn(rendered)
@@ -502,7 +508,6 @@ function peregrine (options) {
         optionsFile: base + '/peregrine.options.js'
       }
 
-
       // check if template file exists
       let tmpFileExists = fs.existsSync(rt.srcFile)
       let seedFileExists = fs.existsSync(rt.seedFile)
@@ -541,6 +546,8 @@ function peregrine (options) {
 
       log.add('page done ' + name + ' - ' + (Date.now() - pageStart) + 'ms')
 
+      allHTML = insertAssets(allHTML, pageOpts.index)
+
       tidy(allHTML, {
         doctype: 'html5',
         indent: true
@@ -551,8 +558,8 @@ function peregrine (options) {
         }
         let writeFile = distPath + 'index.' + fileExtension
         fs.writeFile(writeFile, html, 'utf8', _ => {})
+        pageDone()
       })
-      pageDone()
     })
   }
 
