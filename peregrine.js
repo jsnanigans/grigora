@@ -305,24 +305,27 @@ function peregrine (options) {
 
         if (file.endsWith('.css')) {
           if (inline) {
-            let wait = 0
-            if (file.indexOf('crit.') !== -1) {
-              let fileContent = asset._value
-              assetSources.push('<style>' + fileContent + '</style>')
-              wait = 300
-            }
-
-            assetSources.push(`
-            <script type="text/javascript">
+            let loadCssScript = `
               var f${i} = document.createElement('link');
               f${i}.rel = 'stylesheet';
               f${i}.href = '/${file}';
               f${i}.type = 'text/css';
-              setTimeout(function() {
-                document.getElementsByTagName('head')[0].appendChild(f${i});
-              }, ${wait})
-            </script>
-            `)
+              document.getElementsByTagName('head')[0].appendChild(f${i});
+            `
+            if (file.indexOf('crit.') !== -1) {
+              let fileContent = asset._value
+              assetSources.push('<style>' + fileContent + '</style>')
+              assetSources.push(`
+              <script type="text/javascript">
+              window.addEventListener("load", function inject(){
+                ${loadCssScript}
+              })
+              </script>
+              `)
+            } else {
+              assetSources.push('<script type="text/javascript">' + loadCssScript + '</script>')
+            }
+
           } else {
             assetSources.push('<link rel="stylesheet" href="/' + file + '" />')
           }
