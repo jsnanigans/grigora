@@ -4,17 +4,10 @@
     display: flex
     flex-wrap: wrap
 
-.span
-  for num in (1..$layout.cols)
-    &-{num}
-      width: num * (100 / $layout.cols)%
-      display: block
-      float: left
-
-  for scale in s m l xl xxl
-    +above('{scale}')
-      for num in (1..$layout.cols)
-        &-{num}\@{scale}
-          width: num * (100 / $layout.cols)%
-          display: block
-          float: left
++responsive()
+  &span
+    for num in (1..$layout.cols)
+      &-{num}
+        width: num * (100 / $layout.cols)%
+        display: block
+        float: left
