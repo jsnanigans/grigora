@@ -58,8 +58,9 @@ module.exports = {
       ]
     },
     {
-      route: 'bloop',
-      navigation: 'footer',
+      route: 'colors',
+      name: 'Colors',
+      navigation: 'main',
       components: [
         'demos/colors'
       ]

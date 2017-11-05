@@ -56,9 +56,11 @@ let log = {
 // }
 
 function dropCache (name) {
+  let dropAll = name === '*'
+
   // crear file from componentCache
   Object.keys(componentCache).forEach(key => {
-    if (key.indexOf(name) !== -1) {
+    if (key.indexOf(name) !== -1 || dropAll) {
       delete componentCache[key]
     }
   })
@@ -70,7 +72,7 @@ function dropCache (name) {
 
   // clear componentCache if include is updates
   Object.keys(componentAssets).forEach(key => {
-    if (name === key) {
+    if (name === key || dropAll) {
       componentAssets[key].forEach(compKey => {
         if (componentCache[compKey]) {
           delete componentCache[compKey]
@@ -247,6 +249,8 @@ function peregrine (options) {
 
   this.loadConfig = _ => {
     if (this.configFile) {
+      dropCache('*')
+
       this.config = require(this.configFile)
       if (this.config.globalSeed) {
         globalSeed = this.config.globalSeed
