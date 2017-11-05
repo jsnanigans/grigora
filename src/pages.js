@@ -23,7 +23,6 @@ module.exports = {
       navigation: 'main',
       components: [
         'hero',
-        // 'navigation/buttons',
         'image',
         {
           component: 'image',
@@ -59,10 +58,10 @@ module.exports = {
       ]
     },
     {
-      route: 'secret',
+      route: 'bloop',
       navigation: 'footer',
       components: [
-        'image'
+        'demos/colors'
       ]
     }
   ]
