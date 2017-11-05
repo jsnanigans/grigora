@@ -12,7 +12,7 @@ const MinifyPlugin = require('babel-minify-webpack-plugin')
 const glob = require('glob-all')
 var peregrine = require('../peregrine')
 
-const Extract = new ExtractTextPlugin('css/[name].[contenthash].css')
+const Extract = new ExtractTextPlugin('static/css/[name].[contenthash].css')
 // const ExtractCriticalCSS = new ExtractTextPlugin('css/crit.[contenthash].css')
 
 
@@ -91,14 +91,6 @@ var webpackConfig = merge(baseWebpackConfig, {
   },
   plugins: [
     // new listModules(),
-    new peregrine({
-      // config: path.join(__dirname, '/../peregrine.js')
-      config: path.join(__dirname, '../src/pages.js'),
-      setPaths: paths => {
-        assetPaths = paths
-      },
-      env: 'production'
-    }),
     new webpack.LoaderOptionsPlugin({
       test: /\.styl$/,
       stylus: {
@@ -190,7 +182,7 @@ var webpackConfig = merge(baseWebpackConfig, {
       }
     ]),
 
-    new MinifyPlugin()
+    // new MinifyPlugin(),
 
     // delete unused css
     // new PurifyCSSPlugin({
@@ -198,6 +190,15 @@ var webpackConfig = merge(baseWebpackConfig, {
     //   paths: getFilePaths(),
     //   modulePathsTest: 'src.*\.(js)$'
     // }),
+
+    new peregrine({
+      // config: path.join(__dirname, '/../peregrine.js')
+      config: path.join(__dirname, '../src/pages.js'),
+      setPaths: paths => {
+        assetPaths = paths
+      },
+      env: 'production'
+    }),
   ]
 })
 

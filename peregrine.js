@@ -1,4 +1,4 @@
-const ConcatSource = require('webpack-sources')
+const WPS = require('webpack-sources')
 const fs = require('fs')
 const path = require('path')
 const ejs = require('ejs')
@@ -6,7 +6,7 @@ const ejs = require('ejs')
 const rimraf = require('rimraf')
 const encrypt = require('crypto-js/md5')
 const tidy = require('htmltidy').tidy
-const purify = require('purify')
+const purify = require('purify-css')
 
 let logEnabled = false
 let showErrors = false
@@ -688,6 +688,41 @@ peregrine.prototype.apply = function (compiler) {
       this.watchFiles()
     })
   }.bind(this))
+
+  compiler.plugin('this-compilation', (compilation) => {
+    compilation.plugin('additional-assets', (cb) => {
+      // Go through chunks and purify as configured
+      compilation.chunks.forEach(
+        ({ name: chunkName, files, modules }) => {
+          const assetsToPurify = Object.keys(compilation.assets).map(o => {
+            let rt = compilation.assets[o]
+            rt.name = o
+            return rt
+          }).filter(o => o.name.endsWith('.css'))
+
+          assetsToPurify.forEach(asset => {
+            // let name = asset.name
+            // console.log(asset.source())
+            // const filesToSearch = parse.entries(entryPaths, chunkName).concat(
+            //   search.files(
+            //     modules, options.moduleExtensions || [], file => file.resource
+            //   )
+            // )
+
+            // compilation.assets[name] = new WPS.ConcatSource(
+            //   purify(
+            //     '<div class="nav"></div>',
+            //     asset.source(),
+            //     {}
+            //   )
+            // )
+          })
+        }
+      )
+
+      cb()
+    })
+  })
 }
 
 module.exports = peregrine
