@@ -365,25 +365,29 @@ function peregrine (options) {
 
         if (file.endsWith('.css')) {
           if (inline) {
-            let loadCssScript = `
-              var f${i} = document.createElement('link');
-              f${i}.rel = 'stylesheet';
-              f${i}.href = '/${file}';
-              f${i}.type = 'text/css';
-              document.getElementsByTagName('head')[0].appendChild(f${i});
-            `
+
             if (file.indexOf('crit.') !== -1) {
               let fileContent = asset.source()
               assetSources.push('<style>' + fileContent + '</style>')
               assetSources.push(`
               <script type="text/javascript">
               window.addEventListener("load", function inject(){
-                ${loadCssScript}
+                var f${i} = document.createElement('link');
+                f${i}.rel = 'preload';
+                f${i}.href = '/${file}';
+                f${i}.as = 'style';
+                document.getElementsByTagName('head')[0].appendChild(f${i});
               })
               </script>
               `)
             } else {
-              assetSources.push('<script type="text/javascript">' + loadCssScript + '</script>')
+              assetSources.push(`<script type="text/javascript">
+              var f${i} = document.createElement('link');
+              f${i}.rel = 'stylesheet';
+              f${i}.href = '/${file}';
+              f${i}.type = 'text/css';
+              document.getElementsByTagName('head')[0].appendChild(f${i});
+              </script>`)
             }
           } else {
             assetSources.push('<link rel="stylesheet" href="/' + file + '" />')
