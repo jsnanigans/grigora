@@ -113,6 +113,55 @@ function peregrine (options) {
     return rt
   }
 
+  let wasMinified = []
+  // purify assets
+  this.purify = () => {
+    this.compilation.chunks.forEach(
+      ({ name: chunkName, files, modules }) => {
+        const assetsToPurify = Object.keys(this.compilation.assets).map(o => {
+          let rt = this.compilation.assets[o]
+          rt.name = o
+          return rt
+        }).filter(o => o.name.endsWith('.css'))
+
+        assetsToPurify.forEach(asset => {
+          let name = asset.name
+          // console.log(asset.source())
+          // const filesToSearch = parse.entries(entryPaths, chunkName).concat(
+          //   search.files(
+          //     modules, options.moduleExtensions || [], file => file.resource
+          //   )
+          // )
+
+          if (wasMinified.indexOf(name) !== -1) {
+            return
+          }
+
+          let componentHTML = Object.keys(componentCache)
+            .map(key => componentCache[key][1])
+            .join(' ')
+
+          // console.log(componentHTML)
+
+          console.log(name)
+          this.compilation.assets[name] = new WPS.ConcatSource(
+            purify(
+              componentHTML,
+              // '<div class="xxl/span-4"></div>',
+              asset.source(),
+              {
+                minify: true,
+                info: true
+              }
+            )
+          )
+
+          wasMinified.push(name)
+        })
+      }
+    )
+  }
+
   // resolve custom includes and replace with the tempalte
   this.includeLayouts = (template, cacheName) => {
     let match
@@ -277,7 +326,12 @@ function peregrine (options) {
   this.startTime = Date.now()
   this.prevTimestamps = {}
 
+  let initialInsert = true
   let insertAssets = (html, inline) => {
+    if (initialInsert) {
+      this.purify()
+      initialInsert = false
+    }
     if (html.indexOf('{{insert_scripts}}') !== -1) {
       let assetSources = []
 
@@ -286,7 +340,7 @@ function peregrine (options) {
 
         if (file.endsWith('.js')) {
           // if (inline && file.indexOf('crit.') !== -1 && options.env === 'production') {
-          //   let fileContent = asset._value || asset.children[0]._value
+          //   let fileContent = asset.source()
           //   assetSources.push('<script type="text/javascript">' + fileContent + '</script>')
           // }
           assetSources.push('<script type="text/javascript" async src="/' + file + '"></script>')
@@ -313,7 +367,7 @@ function peregrine (options) {
               document.getElementsByTagName('head')[0].appendChild(f${i});
             `
             if (file.indexOf('crit.') !== -1) {
-              let fileContent = asset._value
+              let fileContent = asset.source()
               assetSources.push('<style>' + fileContent + '</style>')
               assetSources.push(`
               <script type="text/javascript">
@@ -325,7 +379,6 @@ function peregrine (options) {
             } else {
               assetSources.push('<script type="text/javascript">' + loadCssScript + '</script>')
             }
-
           } else {
             assetSources.push('<link rel="stylesheet" href="/' + file + '" />')
           }
@@ -692,33 +745,33 @@ peregrine.prototype.apply = function (compiler) {
   compiler.plugin('this-compilation', (compilation) => {
     compilation.plugin('additional-assets', (cb) => {
       // Go through chunks and purify as configured
-      compilation.chunks.forEach(
-        ({ name: chunkName, files, modules }) => {
-          const assetsToPurify = Object.keys(compilation.assets).map(o => {
-            let rt = compilation.assets[o]
-            rt.name = o
-            return rt
-          }).filter(o => o.name.endsWith('.css'))
+      // compilation.chunks.forEach(
+      //   ({ name: chunkName, files, modules }) => {
+      //     const assetsToPurify = Object.keys(compilation.assets).map(o => {
+      //       let rt = compilation.assets[o]
+      //       rt.name = o
+      //       return rt
+      //     }).filter(o => o.name.endsWith('.css'))
 
-          assetsToPurify.forEach(asset => {
-            // let name = asset.name
-            // console.log(asset.source())
-            // const filesToSearch = parse.entries(entryPaths, chunkName).concat(
-            //   search.files(
-            //     modules, options.moduleExtensions || [], file => file.resource
-            //   )
-            // )
+      //     assetsToPurify.forEach(asset => {
+      //       let name = asset.name
+      //       // console.log(asset.source())
+      //       // const filesToSearch = parse.entries(entryPaths, chunkName).concat(
+      //       //   search.files(
+      //       //     modules, options.moduleExtensions || [], file => file.resource
+      //       //   )
+      //       // )
 
-            // compilation.assets[name] = new WPS.ConcatSource(
-            //   purify(
-            //     '<div class="nav"></div>',
-            //     asset.source(),
-            //     {}
-            //   )
-            // )
-          })
-        }
-      )
+      //       compilation.assets[name] = new WPS.ConcatSource(
+      //         purify(
+      //           '<div class="nav"></div>',
+      //           asset.source(),
+      //           {}
+      //         )
+      //       )
+      //     })
+      //   }
+      // )
 
       cb()
     })

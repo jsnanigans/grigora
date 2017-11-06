@@ -8,4 +8,4 @@
   &span
     for num in (1..$layout.cols)
       &-{num}
-        width: num * (100 / $layout.cols)%
+        width: round(num * (100 / $layout.cols)%, 3)
