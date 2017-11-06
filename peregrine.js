@@ -118,11 +118,18 @@ function peregrine (options) {
   this.purify = () => {
     this.compilation.chunks.forEach(
       ({ name: chunkName, files, modules }) => {
-        const assetsToPurify = Object.keys(this.compilation.assets).map(o => {
+        const allAssets = Object.keys(this.compilation.assets).map(o => {
           let rt = this.compilation.assets[o]
           rt.name = o
           return rt
-        }).filter(o => o.name.endsWith('.css'))
+        })
+
+        let assetsToPurify = allAssets.filter(o => o.name.endsWith('.css'))
+        let assetsToInclude = allAssets.filter(o => o.name.endsWith('.js'))
+
+        assetsToInclude = assetsToInclude.map(ass => {
+          return ass.children[0].source()
+        })
 
         assetsToPurify.forEach(asset => {
           let name = asset.name
@@ -143,15 +150,14 @@ function peregrine (options) {
 
           // console.log(componentHTML)
 
-          console.log(name)
           this.compilation.assets[name] = new WPS.ConcatSource(
             purify(
-              componentHTML,
+              componentHTML + '<script>' + assetsToInclude.join(';') + '</script>',
               // '<div class="xxl/span-4"></div>',
               asset.source(),
               {
-                minify: true,
-                info: true
+                minify: true
+                // info: true
               }
             )
           )
