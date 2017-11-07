@@ -10,7 +10,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const MinifyPlugin = require('babel-minify-webpack-plugin')
 const glob = require('glob-all')
-var peregrine = require('../peregrine')
+var peregrine = require('../peregrine/peregrine')
 
 const Extract = new ExtractTextPlugin('static/css/[name].[contenthash].css')
 // const ExtractCriticalCSS = new ExtractTextPlugin('css/crit.[contenthash].css')

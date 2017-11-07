@@ -28,65 +28,65 @@ const componentCache = {}
 const componentAssets = {}
 const fileCache = {}
 
-let log = {
-  log: '',
-  clear: _ => {
-    this.log = ''
-  },
-  add: t => {
-    if (typeof this.log !== 'string') {
-      this.log = ''
-    }
-    this.log += t + '\n'
-  },
-  print: _ => {
-    setTimeout(_ => {
-      if (logEnabled) {
-        console.log('=======')
-        console.log(this.log)
-        console.log('=======')
-      }
-    }, 200)
-  }
-}
-
 // function requireUncached (module) {
 //   delete require.cache[module]
 //   return require(module)
 // }
-
-function dropCache (name) {
-  let dropAll = name === '*'
-
-  // crear file from componentCache
-  Object.keys(componentCache).forEach(key => {
-    if (key.indexOf(name) !== -1 || dropAll) {
-      delete componentCache[key]
-    }
-  })
-
-  // clear file cache
-  if (fileCache[name]) {
-    delete fileCache[name]
-  }
-
-  // clear componentCache if include is updates
-  Object.keys(componentAssets).forEach(key => {
-    if (name === key || dropAll) {
-      componentAssets[key].forEach(compKey => {
-        if (componentCache[compKey]) {
-          delete componentCache[compKey]
-        }
-      })
-    }
-  })
-}
 
 function peregrine (options) {
   // this.options = options
   this.configFile = options.config || false
   this.config = {}
   this.relatedFiles = []
+
+  this.log = {
+    log: '',
+    clear: _ => {
+      this.log = ''
+    },
+    add: t => {
+      if (typeof this.log !== 'string') {
+        this.log = ''
+      }
+      this.log += t + '\n'
+    },
+    print: _ => {
+      setTimeout(_ => {
+        if (logEnabled) {
+          console.log('=======')
+          console.log(this.log)
+          console.log('=======')
+        }
+      }, 200)
+    }
+  }
+
+  this.dropCache = (name) => {
+    let dropAll = name === '*'
+
+    // crear file from componentCache
+    Object.keys(componentCache).forEach(key => {
+      if (key.indexOf(name) !== -1 || dropAll) {
+        delete componentCache[key]
+      }
+    })
+
+    // clear file cache
+    if (fileCache[name]) {
+      delete fileCache[name]
+    }
+
+    // clear componentCache if include is updates
+    Object.keys(componentAssets).forEach(key => {
+      if (name === key || dropAll) {
+        componentAssets[key].forEach(compKey => {
+          if (componentCache[compKey]) {
+            delete componentCache[compKey]
+          }
+        })
+      }
+    })
+  }
 
   if (options.setPaths) {
     options.setPaths(usedTemplates)
@@ -96,7 +96,7 @@ function peregrine (options) {
   let partTemplateRegex = /\{\{+(part) '+(.*)'\}\}/g
 
   this.parseAssetPath = assetPath => {
-    let basePath = path.join(__dirname, 'src')
+    let basePath = path.join(__dirname, '../src')
     let rt = false
 
     if (assetPath.indexOf('layout') === 0) {
@@ -289,6 +289,7 @@ function peregrine (options) {
         callback(fileCache[filename])
       } else {
         try {
+          console.log(filename)
           let fileContent = fs.readFileSync(filename, 'utf8')
           fileCache[filename] = fileContent
           callback(fileContent)
@@ -304,7 +305,7 @@ function peregrine (options) {
 
   this.loadConfig = _ => {
     if (this.configFile) {
-      dropCache('*')
+      this.dropCache('*')
 
       this.config = require(this.configFile)
       if (this.config.globalSeed) {
@@ -365,7 +366,6 @@ function peregrine (options) {
 
         if (file.endsWith('.css')) {
           if (inline) {
-
             if (file.indexOf('crit.') !== -1) {
               let fileContent = asset.source()
               assetSources.push('<style>' + fileContent + '</style>')
@@ -427,7 +427,7 @@ function peregrine (options) {
     if (cached[0] !== false &&
       now - cacheAge < cached[0]) {
       cached[0] = now
-      log.add('cache used')
+      // this.log.add('cache used')
 
       return cached[1]
     }
@@ -440,7 +440,7 @@ function peregrine (options) {
         seed = Object.assign({}, globalSeed, seed)
         rendered = ejs.render(body, seed)
 
-        log.add('cache created')
+        // this.log.add('cache created')
         if (useCacheIfExists) {
           componentCache[cacheName] = [now, rendered]
         }
@@ -453,10 +453,10 @@ function peregrine (options) {
   }
 
   this.renderSingleComponent = (comp, rtfn) => {
-    let modID = comp.srcFile.split('/')
-    modID = modID[modID.length - 3] + ' - ' + modID[modID.length - 1]
-    let modStart = Date.now()
-    log.add('start module ' + modID)
+    // let modID = comp.srcFile.split('/')
+    // modID = modID[modID.length - 3] + ' - ' + modID[modID.length - 1]
+    // let modStart = Date.now()
+    // this.log.add('start module ' + modID)
     this.readModuleTemplate(comp.srcFile, body => {
       if (!body) {
         body = ''
@@ -469,7 +469,7 @@ function peregrine (options) {
 
       let rendered = renderTemplate(body, seed, cacheName + '--' + hash, comp)
 
-      log.add('fin module ' + modID + ' - ' + (Date.now() - modStart + 'ms'))
+      // this.log.add('fin module ' + modID + ' - ' + (Date.now() - modStart + 'ms'))
 
       if (rtfn) {
         rtfn(rendered)
@@ -535,10 +535,10 @@ function peregrine (options) {
   }
 
   this.generatePage = (pageOpts, options, pageDone) => {
-    const name = pageOpts.name || 'index'
+    // const name = pageOpts.name || 'index'
 
-    log.add('start page: ' + name)
-    let pageStart = Date.now()
+    // this.log.add('start page: ' + name)
+    // let pageStart = Date.now()
 
     let prepend = options.beforeEach.components || []
     let append = options.afterEach.components || []
@@ -564,7 +564,7 @@ function peregrine (options) {
         variant = nameSplit[nameSplit.length - 1]
       }
 
-      let base = path.join(__dirname, componentsPath) + name
+      let base = path.join(__dirname, '../' + componentsPath) + name
 
       let rt = {
         name,
@@ -600,7 +600,7 @@ function peregrine (options) {
     })
 
     this.renderComponents(componentsObjects, (allHTML) => {
-      let distPath = path.join(__dirname, './dist/')
+      let distPath = path.join(__dirname, '../dist/')
       let fileExtension = (options.fileExtension || 'html')
 
       if (pageOpts.index !== true) {
@@ -610,7 +610,7 @@ function peregrine (options) {
         distPath += pageOpts.route + '/'
       }
 
-      log.add('page done ' + name + ' - ' + (Date.now() - pageStart) + 'ms')
+      // this.log.add('page done ' + name + ' - ' + (Date.now() - pageStart) + 'ms')
 
       allHTML = insertAssets(allHTML, pageOpts.index)
 
@@ -630,7 +630,7 @@ function peregrine (options) {
   }
 
   this.watchFiles = _ => {
-    this.compilation.fileDependencies.push(path.join(__dirname, './src/pages.js'))
+    this.compilation.fileDependencies.push(path.join(__dirname, '../src/pages.js'))
     this.relatedFiles.forEach(file => {
       this.compilation.fileDependencies.push(file)
     })
@@ -651,7 +651,7 @@ function peregrine (options) {
       this.generatePage(page, options, _ => {
         pagesDone++
         if (pagesDone === pages.length) {
-          log.print()
+          // this.log.print()
           done()
         }
       })
@@ -662,11 +662,12 @@ function peregrine (options) {
 }
 
 let initialBuild = true
+
 peregrine.prototype.apply = function (compiler) {
   this.distPath = compiler.options.output.path
 
   compiler.plugin('emit', function (compilation, callback) {
-    let directory = path.join(__dirname, './dist')
+    let directory = path.join(__dirname, '../dist')
     if (!fs.existsSync(directory)) {
       fs.mkdirSync(directory)
     } else {
@@ -675,7 +676,7 @@ peregrine.prototype.apply = function (compiler) {
     }
 
     fs.readdir(directory, (err, files) => {
-      log.clear()
+      // this.log.clear()
       if (err) throw err
 
       if (initialBuild) {
@@ -694,7 +695,7 @@ peregrine.prototype.apply = function (compiler) {
 
       changedFiles.forEach(file => {
         delete require.cache[file]
-        dropCache(file)
+        this.dropCache(file)
         if (file === this.configFile) {
           this.loadConfig()
         }
@@ -720,29 +721,6 @@ peregrine.prototype.apply = function (compiler) {
 
         this.loadConfig()
         this.generatePages(_ => {
-          // let contentFiles = []
-
-          // Object.keys(componentAssets).forEach(key => {
-          //   contentFiles.push(key)
-          // })
-          // Object.keys(compilation.assets).forEach(key => {
-          //   if (key.endsWith('.js')) {
-          //     contentFiles.push(key)
-          //   }
-          // })
-
-          // compilation.chunks.forEach(chunk => {
-          //   Object.keys(chunk).forEach(kk => {
-          //     // console.log(kk)
-          //   })
-
-          //   // console.log(chunk.files)
-
-          //   chunk.files.forEach(file => {
-          //     compilation.assets[file] = new ConcatSource(['quaalskjd haslk dhasljkdh alsjkdh lasjkdhlakjkkk'])
-          //   })
-          // })
-
           callback()
         })
       } else {
@@ -751,41 +729,6 @@ peregrine.prototype.apply = function (compiler) {
       this.watchFiles()
     })
   }.bind(this))
-
-  compiler.plugin('this-compilation', (compilation) => {
-    compilation.plugin('additional-assets', (cb) => {
-      // Go through chunks and purify as configured
-      // compilation.chunks.forEach(
-      //   ({ name: chunkName, files, modules }) => {
-      //     const assetsToPurify = Object.keys(compilation.assets).map(o => {
-      //       let rt = compilation.assets[o]
-      //       rt.name = o
-      //       return rt
-      //     }).filter(o => o.name.endsWith('.css'))
-
-      //     assetsToPurify.forEach(asset => {
-      //       let name = asset.name
-      //       // console.log(asset.source())
-      //       // const filesToSearch = parse.entries(entryPaths, chunkName).concat(
-      //       //   search.files(
-      //       //     modules, options.moduleExtensions || [], file => file.resource
-      //       //   )
-      //       // )
-
-      //       compilation.assets[name] = new WPS.ConcatSource(
-      //         purify(
-      //           '<div class="nav"></div>',
-      //           asset.source(),
-      //           {}
-      //         )
-      //       )
-      //     })
-      //   }
-      // )
-
-      cb()
-    })
-  })
 }
 
 module.exports = peregrine
