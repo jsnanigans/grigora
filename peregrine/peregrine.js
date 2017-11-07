@@ -289,7 +289,6 @@ function peregrine (options) {
         callback(fileCache[filename])
       } else {
         try {
-          console.log(filename)
           let fileContent = fs.readFileSync(filename, 'utf8')
           fileCache[filename] = fileContent
           callback(fileContent)
@@ -335,6 +334,10 @@ function peregrine (options) {
 
   let initialInsert = true
   let insertAssets = (html, inline) => {
+    if (options.webpack === false) {
+      return html
+    }
+
     if (initialInsert) {
       this.purify()
       initialInsert = false
