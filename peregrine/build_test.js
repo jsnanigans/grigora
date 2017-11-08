@@ -12,12 +12,20 @@ let p = new Peregrine({
 })
 
 if (fs.existsSync(directory)) {
-  rimraf.sync(directory)
-  fs.mkdirSync(directory)
+  fs.readdirSync(directory).forEach(dir => {
+    let p = path.join(directory, dir)
+
+    if (fs.lstatSync(p).isDirectory()) {
+      if (dir !== 'static') {
+        rimraf.sync(p)
+      }
+    } else {
+      fs.unlinkSync(p)
+    }
+  })
 } else {
   fs.mkdirSync(directory)
 }
 
 p.loadConfig()
 p.generatePages(_ => {})
-// peregrine.generatePages()

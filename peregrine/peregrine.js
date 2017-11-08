@@ -36,6 +36,7 @@ const fileCache = {}
 function peregrine (options) {
   // this.options = options
   this.configFile = options.config || false
+  this.tempFile = path.join(__dirname, '.peregrine.temp.js')
   this.config = {}
   this.relatedFiles = []
 
@@ -334,73 +335,109 @@ function peregrine (options) {
 
   let initialInsert = true
   let insertAssets = (html, inline) => {
-    if (options.webpack === false) {
-      return html
-    }
+    // if (options.webpack === false) {
+    //   return html
+    // }
+    // return html
 
     if (initialInsert) {
-      this.purify()
+      // this.purify()
       initialInsert = false
     }
-    if (html.indexOf('{{insert_scripts}}') !== -1) {
-      let assetSources = []
 
+    let assets = {
+      css: {},
+      js: {}
+    }
+
+    if (this.compilation) {
       Object.keys(this.compilation.assets).forEach(file => {
-        // let asset = this.compilation.assets[file]
+        let asset = this.compilation.assets[file]
 
         if (file.endsWith('.js')) {
-          // if (inline && file.indexOf('crit.') !== -1 && options.env === 'production') {
-          //   let fileContent = asset.source()
-          //   assetSources.push('<script type="text/javascript">' + fileContent + '</script>')
-          // }
-          assetSources.push('<script type="text/javascript" async src="/' + file + '"></script>')
+          assets.js[file] = asset.source()
+        }
+
+        if (file.endsWith('.css')) {
+          assets.css[file] = asset.source()
         }
       })
 
+      fs.writeFileSync(this.tempFile, JSON.stringify(assets))
+    } else {
+      if (fs.existsSync(this.tempFile)) {
+        let tempFileContent = fs.readFileSync(this.tempFile)
+        assets = JSON.parse(tempFileContent)
+      } else {
+        console.log('Temp file not found: ' + this.tempFile + ' \n |- Run "yarn build" to create it')
+      }
+    }
+
+    // console.log(assets)
+
+    if (html.indexOf('{{insert_scripts}}') !== -1) {
+      let scripts = []
+
+      Object.keys(assets.js).forEach(file => {
+        scripts.push('<script type="text/javascript" src="/' + file + '"></script>')
+      })
+
+      html = html.replace('{{insert_scripts}}', scripts.join(''))
+
+      // let assetSources = []
       // assetSources.reverse()
 
-      html = html.replace('{{insert_scripts}}', assetSources.join(''))
+      // if (inline && file.indexOf('crit.') !== -1 && options.env === 'production') {
+      //   let fileContent = asset.source()
+      //   assetSources.push('<script type="text/javascript">' + fileContent + '</script>')
+      // }
+      // assetSources.push('<script type="text/javascript" async src="/' + file + '"></script>')
+
+      // html = html.replace('{{insert_scripts}}', assetSources.join(''))
     }
 
     if (html.indexOf('{{insert_styles}}') !== -1) {
-      let assetSources = []
-      Object.keys(this.compilation.assets).forEach((file, i) => {
-        let asset = this.compilation.assets[file]
+      let scripts = []
 
-        if (file.endsWith('.css')) {
-          if (inline) {
-            if (file.indexOf('crit.') !== -1) {
-              let fileContent = asset.source()
-              assetSources.push('<style>' + fileContent + '</style>')
-              assetSources.push(`
-              <script type="text/javascript">
-              window.addEventListener("load", function inject(){
-                var f${i} = document.createElement('link');
-                f${i}.rel = 'preload';
-                f${i}.href = '/${file}';
-                f${i}.as = 'style';
-                document.getElementsByTagName('head')[0].appendChild(f${i});
-              })
-              </script>
-              `)
-            } else {
-              assetSources.push(`<script type="text/javascript">
-              var f${i} = document.createElement('link');
-              f${i}.rel = 'stylesheet';
-              f${i}.href = '/${file}';
-              f${i}.type = 'text/css';
-              document.getElementsByTagName('head')[0].appendChild(f${i});
-              </script>`)
-            }
-          } else {
-            assetSources.push('<link rel="stylesheet" href="/' + file + '" />')
-          }
-        }
+      Object.keys(assets.css).forEach(file => {
+        scripts.push('<link rel="stylesheet" href="/' + file + '" />')
       })
 
-      assetSources.reverse()
+      html = html.replace('{{insert_styles}}', scripts.join(''))
 
-      html = html.replace('{{insert_styles}}', assetSources.join(''))
+      // let assetSources = []
+
+      // if (inline) {
+      //   if (file.indexOf('crit.') !== -1) {
+      //     let fileContent = asset.source()
+      //     assetSources.push('<style>' + fileContent + '</style>')
+      //     assetSources.push(`
+      //     <script type="text/javascript">
+      //     window.addEventListener("load", function inject(){
+      //       var f${i} = document.createElement('link');
+      //       f${i}.rel = 'preload';
+      //       f${i}.href = '/${file}';
+      //       f${i}.as = 'style';
+      //       document.getElementsByTagName('head')[0].appendChild(f${i});
+      //     })
+      //     </script>
+      //     `)
+      //   } else {
+      //     assetSources.push(`<script type="text/javascript">
+      //     var f${i} = document.createElement('link');
+      //     f${i}.rel = 'stylesheet';
+      //     f${i}.href = '/${file}';
+      //     f${i}.type = 'text/css';
+      //     document.getElementsByTagName('head')[0].appendChild(f${i});
+      //     </script>`)
+      //   }
+      // } else {
+      //   assetSources.push('<link rel="stylesheet" href="/' + file + '" />')
+      // }
+
+      // assetSources.reverse()
+
+      // html = html.replace('{{insert_styles}}', assetSources.join(''))
     }
 
     return html
