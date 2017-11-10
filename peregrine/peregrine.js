@@ -6,7 +6,7 @@ const ejs = require('ejs')
 const rimraf = require('rimraf')
 const encrypt = require('crypto-js/md5')
 const tidy = require('htmltidy').tidy
-const purify = require('purify-css')
+const purify = require('purifycss-extended')
 
 let logEnabled = false
 let showErrors = false
@@ -128,8 +128,9 @@ function peregrine (options) {
         let assetsToPurify = allAssets.filter(o => o.name.endsWith('.css'))
         let assetsToInclude = allAssets.filter(o => o.name.endsWith('.js'))
 
-        assetsToInclude = assetsToInclude.map(ass => {
-          return ass.children[0].source()
+        assetsToInclude = assetsToInclude.map(asset => {
+          return asset.children[0].source()
+          // return path.join(__dirname, '../src')
         })
 
         assetsToPurify.forEach(asset => {
@@ -145,15 +146,20 @@ function peregrine (options) {
             return
           }
 
-          let componentHTML = Object.keys(componentCache)
-            .map(key => componentCache[key][1])
-            .join(' ')
+          let sourceAssets = Object.keys(componentCache)
+            // .map(key => componentCache[key][1])
+            .map(key => key.split('++')[0])
+            .filter(file => fs.existsSync(file))
+            // .join(' ')
 
-          // console.log(componentHTML)
+          // console.log(sourceAssets)
+
+          // sourceAssets.push('<script>' + assetsToInclude.join(';') + '</script>')
 
           this.compilation.assets[name] = new WPS.ConcatSource(
             purify(
-              componentHTML + '<script>' + assetsToInclude.join(';') + '</script>',
+              sourceAssets,
+              // componentHTML + '<script>' + assetsToInclude.join(';') + '</script>',
               // '<div class="xxl/span-4"></div>',
               asset.source(),
               {
