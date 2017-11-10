@@ -163,7 +163,7 @@ function peregrine (options) {
               // '<div class="xxl/span-4"></div>',
               asset.source(),
               {
-                minify: true
+                // minify: true
                 // info: true
               }
             )
@@ -767,6 +767,7 @@ peregrine.prototype.apply = function (compiler) {
 
         this.loadConfig()
         this.generatePages(_ => {
+          this.purify()
           callback()
         })
       } else {
