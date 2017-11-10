@@ -1,9 +1,14 @@
-.ac // align content
-  &-v, // vertical
-  &-a
++responsive()
+  &x
     display: flex
-    align-items: center
-  &-h, // horizontal
-  &-a
-    display: flex
-    justify-content: center
+    flex-wrap: wrap
+
+    &-c // align content
+      &v, // vertical
+      &a
+        display: flex
+        align-items: center
+      &h, // horizontal
+      &a
+        display: flex
+        justify-content: center

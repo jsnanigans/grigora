@@ -99,6 +99,7 @@ var webpackConfig = merge(baseWebpackConfig, {
         default: {
           use: [
             require('rupture')(),
+            require('jeet')(),
             // require('typographic')()
           ],
         },

@@ -68,6 +68,7 @@ module.exports = merge(baseWebpackConfig, {
         default: {
           use: [
             require('rupture')(),
+            require('jeet')()
             // require('typographic')()
           ],
         },

@@ -22,7 +22,7 @@ module.exports = {
       name: 'Home',
       navigation: 'main',
       components: [
-        'hero',
+        'hero/cols',
         'image',
         {
           component: 'image',
