@@ -1,16 +1,18 @@
-require('./reset')
-require('./base')
-require('./layout')
-require('./divider')
-require('./button')
-require('./form')
-require('./image')
-require('./link')
-require('./list')
-require('./spacing')
-require('./table')
-require('./typography')
-require('./utility')
-require('./positioning')
-require('./grid')
-require('./colors')
+require([
+  './reset',
+  './base',
+  './layout',
+  './divider',
+  './button',
+  './form',
+  './image',
+  './link',
+  './list',
+  './spacing',
+  './table',
+  './typography',
+  './utility',
+  './positioning',
+  './grid',
+  './colors'
+])

@@ -38,10 +38,12 @@ ul
 
 			for size in (0..$layout.spacingSteps)
 
-				if size == 1
-					$tmp = $layout.spacingBase
+				if size == 0
+					$tmp = 0
+				else
+					$tmp = $tmp + $layout.spacingBase
 
-				$tmp = round($tmp * $layout.spacingMultiplyer, 3)
+
 
 				&a-{size}
 					{$attr}: $tmp
