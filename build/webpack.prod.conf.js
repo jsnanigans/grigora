@@ -183,7 +183,7 @@ var webpackConfig = merge(baseWebpackConfig, {
       }
     ]),
 
-    // new MinifyPlugin(),
+    new MinifyPlugin(),
 
     // delete unused css
     // new PurifyCSSPlugin({
