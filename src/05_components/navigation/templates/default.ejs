@@ -1,7 +1,7 @@
 <div class="nav--container">
   <nav class="nav">
     <ul class="nav__list">
-      <% generatedNavigation.main.forEach(item => { %>
+      <% [{name: 'not done', slug: 'not-done'}].forEach(item => { %>
         <li class="nav__list__item">
           <a href="<%= item.slug || '/' %>" class="nav__link"><%= item.name %></a>
         </li>

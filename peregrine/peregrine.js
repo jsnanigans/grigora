@@ -312,21 +312,21 @@ function peregrine (options) {
       if (this.config.globalSeed) {
         globalSeed = this.config.globalSeed
 
-        const genNavs = {}
-        this.config.pages.map(page => {
-          if (page.navigation) {
-            if (!genNavs[page.navigation]) {
-              genNavs[page.navigation] = []
-            }
+        // const genNavs = {}
+        // this.config.pages.map(page => {
+          // if (page.navigation) {
+          //   if (!genNavs[page.navigation]) {
+          //     genNavs[page.navigation] = []
+          //   }
 
-            genNavs[page.navigation].push({
-              name: page.name,
-              slug: page.index ? '/' : '/' + page.route
-            })
-          }
-        })
+          //   genNavs[page.navigation].push({
+          //     name: page.name,
+          //     slug: page.index ? '/' : '/' + page.route
+          //   })
+          // }
+        // })
 
-        globalSeed.generatedNavigation = genNavs
+        // globalSeed.generatedNavigation = genNavs
       }
     }
   }
@@ -614,8 +614,22 @@ function peregrine (options) {
   this.generatePages = done => {
     const conf = this.config
     const options = conf.options || {}
-    const pages = conf.pages || []
     const pageList = []
+
+    const pages = Object.keys(conf.pages).map(pageKey => {
+      const page = conf.pages[pageKey]
+      page.key = pageKey
+
+      if (!page.route && page.index !== true) {
+        page.route = page.name.toLowerCase()
+      }
+      if (page.index === true) {
+        page.route = '/'
+      }
+
+      return page
+    })
+    console.log(pages)
 
     let pagesDone = 0
     pages.forEach(page => {

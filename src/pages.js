@@ -16,11 +16,10 @@ module.exports = {
       components: ['_foot']
     }
   },
-  pages: [
-    {
-      index: true,
+  pages: {
+    'index': {
       name: 'Home',
-      navigation: 'main',
+      index: true,
       components: [
         'hero/cols',
         'image',
@@ -48,22 +47,18 @@ module.exports = {
         'image'
       ]
     },
-    {
-      route: 'contact',
+    'test_contact': {
       name: 'Contact',
-      navigation: 'main',
       components: [
         'image',
         'contact'
       ]
     },
-    {
-      route: 'colors',
+    'color-demo': {
       name: 'Colors',
-      navigation: 'main',
       components: [
         'demos/colors'
       ]
     }
-  ]
+  }
 }
