@@ -22,19 +22,12 @@ let globalSeed = {}
 const usedTemplates = []
 
 const cacheAge = 1.2e+6 // 20 minutes
-// let cacheAge = 1000 // 20 minutes
 
 const componentCache = {}
 const componentAssets = {}
 const fileCache = {}
 
-// function requireUncached (module) {
-//   delete require.cache[module]
-//   return require(module)
-// }
-
 function peregrine (options) {
-  // this.options = options
   this.configFile = options.config || false
   this.tempDir = path.join(__dirname, '.peregrine-temp')
   this.tempFile = path.join(this.tempDir, 'data.json')
@@ -122,6 +115,10 @@ function peregrine (options) {
   const wasMinified = []
   // purify assets
   this.purify = () => {
+    if (options.env === 'development') {
+      return
+    }
+
     this.compilation.chunks.forEach(
       ({ name: chunkName }) => {
         const allAssets = Object.keys(this.compilation.assets).map(o => {
@@ -338,9 +335,8 @@ function peregrine (options) {
   this.prevTimestamps = {}
 
   let initialInsert = true
-  const insertAssets = (html, inline) => {
+  this.insertAssets = (html) => {
     if (initialInsert) {
-      // this.purify()
       initialInsert = false
     }
 
@@ -372,8 +368,6 @@ function peregrine (options) {
       }
     }
 
-    // console.log(assets)
-
     if (html.indexOf('{{insert_scripts}}') !== -1) {
       const scripts = []
 
@@ -388,7 +382,13 @@ function peregrine (options) {
       const scripts = []
 
       Object.keys(assets.css).forEach(file => {
-        scripts.push('<link rel="stylesheet" href="/' + file + '" />')
+        if (file.indexOf('crit.') !== -1) {
+          scripts.push(`<style>${assets.css[file]}</style>`)
+        } else {
+          scripts.push(`<link rel="stylesheet" href="/${file}" media="none" onload="if(media!='all')media='all'">
+          <noscript><link rel="stylesheet" href="/${file}"></noscript>`)
+        }
+        // scripts.push('<link rel="stylesheet" href="/' + file + '" />')
       })
 
       html = html.replace('{{insert_styles}}', scripts.join(''))
@@ -586,7 +586,8 @@ function peregrine (options) {
         distPath += pageOpts.route + '/'
       }
 
-      allHTML = insertAssets(allHTML, pageOpts.index)
+      // this.purify()
+      // allHTML = insertAssets(allHTML)
 
       tidy(allHTML, {
         doctype: 'html5',
@@ -597,8 +598,8 @@ function peregrine (options) {
           return
         }
         const writeFile = distPath + 'index.' + fileExtension
-        fs.writeFile(writeFile, html, 'utf8', _ => {})
-        pageDone()
+        // fs.writeFile(writeFile, html, 'utf8', _ => {})
+        pageDone(writeFile, html)
       })
     })
   }
@@ -614,13 +615,16 @@ function peregrine (options) {
     const conf = this.config
     const options = conf.options || {}
     const pages = conf.pages || []
+    const pageList = []
 
     let pagesDone = 0
     pages.forEach(page => {
-      this.generatePage(page, options, _ => {
+      this.generatePage(page, options, (file, content) => {
         pagesDone++
+
+        pageList.push({ file, content })
         if (pagesDone === pages.length) {
-          done()
+          done(pageList)
         }
       })
     })
@@ -664,7 +668,13 @@ peregrine.prototype.apply = function (compiler) {
           this.loadConfig()
         }
         if (file === this.configFile || this.relatedFiles.indexOf(file) !== -1) {
-          this.generatePages(_ => {
+          this.generatePages(pageList => {
+            this.purify()
+            pageList.forEach(page => {
+              const html = this.insertAssets(page.content)
+              fs.writeFileSync(page.file, html, 'utf8')
+            })
+
             if (compilation.hotMiddleware) {
               setTimeout(_ => {
                 compilation.hotMiddleware.publish({
@@ -684,8 +694,13 @@ peregrine.prototype.apply = function (compiler) {
         this.initial = false
 
         this.loadConfig()
-        this.generatePages(_ => {
+        this.generatePages(pageList => {
           this.purify()
+          pageList.forEach(page => {
+            const html = this.insertAssets(page.content)
+            fs.writeFileSync(page.file, html, 'utf8')
+          })
+
           callback()
         })
       } else {

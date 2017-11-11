@@ -1,7 +1,13 @@
 $transition := {
-  time: 140ms
+  time: 200ms,
+  easeing: cubic-bezier(0.645, 0.045, 0.355, 1), // easeInOutCubic
 }
+
+/*
+Easing curves: http://easings.net/
+*/
 
 trans()
   transition: arguments
   transition-duration: $transition.time
+  transition-timing-function: $transition.easeing

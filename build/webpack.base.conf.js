@@ -8,8 +8,8 @@ function resolve (dir) {
 
 module.exports = {
   entry: {
-    main: './src/main.js',
-    crit: './src/crit.js'
+    crit: './src/crit.js',
+    main: './src/main.js'
   },
   output: {
     path: config.build.assetsRoot,
