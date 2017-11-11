@@ -28,4 +28,9 @@ if (fs.existsSync(directory)) {
 }
 
 p.loadConfig()
-p.generatePages(_ => {})
+p.generatePages(pageList => {
+  pageList.forEach(page => {
+    const html = p.insertAssets(page.content)
+    fs.writeFileSync(page.file, html, 'utf8')
+  })
+})
