@@ -2091,6 +2091,12 @@ eslint-module-utils@^2.1.1:
     debug "^2.6.8"
     pkg-dir "^1.0.0"
 
+eslint-plugin-html@^2.0.0:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-html/-/eslint-plugin-html-2.0.3.tgz#7c89883ab0c85fa5d28b666a14a4e906aa90b897"
+  dependencies:
+    htmlparser2 "^3.8.2"
+
 eslint-plugin-html@^3.2.2:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/eslint-plugin-html/-/eslint-plugin-html-3.2.2.tgz#ef7093621d3a93de3206fd1f92f347ea9a1a4dfa"
@@ -2129,6 +2135,12 @@ eslint-plugin-promise@^3.6.0:
 eslint-plugin-standard@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/eslint-plugin-standard/-/eslint-plugin-standard-3.0.1.tgz#34d0c915b45edc6f010393c7eef3823b08565cf2"
+
+eslint-plugin-vue-libs@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-vue-libs/-/eslint-plugin-vue-libs-1.2.1.tgz#d50f3ebef50c4076dae84e8cff3a3c350f6bac44"
+  dependencies:
+    eslint-plugin-html "^2.0.0"
 
 eslint-scope@^3.7.1:
   version "3.7.1"

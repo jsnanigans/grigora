@@ -5,7 +5,7 @@ var fs = require('fs')
 
 var directory = path.join(__dirname, '../dist')
 
-let p = new Peregrine({
+const p = new Peregrine({
   config: path.join(__dirname, '../src/pages.js'),
   env: 'production',
   webpack: false
@@ -13,7 +13,7 @@ let p = new Peregrine({
 
 if (fs.existsSync(directory)) {
   fs.readdirSync(directory).forEach(dir => {
-    let p = path.join(directory, dir)
+    const p = path.join(directory, dir)
 
     if (fs.lstatSync(p).isDirectory()) {
       if (dir !== 'static') {

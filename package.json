@@ -21,6 +21,7 @@
     "ejs2-loader": "^1.0.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-vue-libs": "^1.2.1",
     "faker": "^4.1.0",
     "glob-all": "^3.1.0",
     "htmltidy": "^0.0.6",

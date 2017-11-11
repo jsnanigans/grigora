@@ -8,7 +8,7 @@ const encrypt = require('crypto-js/md5')
 const tidy = require('htmltidy').tidy
 const purify = require('purifycss-extended')
 
-let logEnabled = false
+const logEnabled = false
 let showErrors = false
 
 if (process.env.NODE_ENV === 'development') {
@@ -16,12 +16,12 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 const componentsPath = './src/05_components/'
-let fileExtension = '.ejs'
+const fileExtension = '.ejs'
 let globalSeed = {}
 
-let usedTemplates = []
+const usedTemplates = []
 
-let cacheAge = 1.2e+6 // 20 minutes
+const cacheAge = 1.2e+6 // 20 minutes
 // let cacheAge = 1000 // 20 minutes
 
 const componentCache = {}
@@ -68,7 +68,7 @@ function peregrine (options) {
   }
 
   this.dropCache = (name) => {
-    let dropAll = name === '*'
+    const dropAll = name === '*'
 
     // crear file from componentCache
     Object.keys(componentCache).forEach(key => {
@@ -98,11 +98,11 @@ function peregrine (options) {
     options.setPaths(usedTemplates)
   }
 
-  let layoutTemplateRegex = /\{\{+(layout) '+(.*)'\}\}/g
-  let partTemplateRegex = /\{\{+(part) '+(.*)'\}\}/g
+  const layoutTemplateRegex = /\{\{+(layout) '+(.*)'\}\}/g
+  const partTemplateRegex = /\{\{+(part) '+(.*)'\}\}/g
 
   this.parseAssetPath = assetPath => {
-    let basePath = path.join(__dirname, '../src')
+    const basePath = path.join(__dirname, '../src')
     let rt = false
 
     if (assetPath.indexOf('layout') === 0) {
@@ -119,49 +119,38 @@ function peregrine (options) {
     return rt
   }
 
-  let wasMinified = []
+  const wasMinified = []
   // purify assets
   this.purify = () => {
     this.compilation.chunks.forEach(
-      ({ name: chunkName, files, modules }) => {
+      ({ name: chunkName }) => {
         const allAssets = Object.keys(this.compilation.assets).map(o => {
-          let rt = this.compilation.assets[o]
+          const rt = this.compilation.assets[o]
           rt.name = o
           return rt
         })
 
-        let jsAssetsTempFile = path.join(this.tempDir, 'purify-js-assets.js')
+        const jsAssetsTempFile = path.join(this.tempDir, 'purify-js-assets.js')
 
-        let assetsToPurify = allAssets.filter(o => o.name.endsWith('.css'))
+        const assetsToPurify = allAssets.filter(o => o.name.endsWith('.css'))
         let assetsToInclude = allAssets.filter(o => o.name.endsWith('.js'))
 
         assetsToInclude = assetsToInclude.map(asset => {
           return asset.children[0].source()
-          // return path.join(__dirname, '../src')
         })
 
         fs.writeFileSync(jsAssetsTempFile, assetsToInclude, 'utf8')
 
         assetsToPurify.forEach(asset => {
-          let name = asset.name
-          // console.log(asset.source())
-          // const filesToSearch = parse.entries(entryPaths, chunkName).concat(
-          //   search.files(
-          //     modules, options.moduleExtensions || [], file => file.resource
-          //   )
-          // )
+          const name = asset.name
 
           if (wasMinified.indexOf(name) !== -1) {
             return
           }
 
-          let sourceAssets = Object.keys(componentCache)
-            // .map(key => componentCache[key][1])
+          const sourceAssets = Object.keys(componentCache)
             .map(key => key.split('++')[0])
             .filter(file => fs.existsSync(file))
-            // .join(' ')
-
-          // console.log(sourceAssets)
 
           sourceAssets.push(jsAssetsTempFile)
 
@@ -190,9 +179,9 @@ function peregrine (options) {
     do {
       match = layoutTemplateRegex.exec(template)
       if (match) {
-        let snippet = match[0]
+        const snippet = match[0]
         let assetPath = match[1]
-        let layoutName = match[2]
+        const layoutName = match[2]
 
         if (layoutName.indexOf(fileExtension) === -1) {
           assetPath += '/default' + fileExtension
@@ -214,7 +203,7 @@ function peregrine (options) {
         }
 
         try {
-          let fileContent = fs.readFileSync(resolvedPath, 'utf8')
+          const fileContent = fs.readFileSync(resolvedPath, 'utf8')
           template = template.replace(snippet, fileContent)
 
           if (this.relatedFiles.indexOf(resolvedPath) === -1) {
@@ -233,9 +222,9 @@ function peregrine (options) {
     do {
       match = partTemplateRegex.exec(template)
       if (match) {
-        let snippet = match[0]
+        const snippet = match[0]
         let assetPath = match[1]
-        let layoutName = match[2]
+        const layoutName = match[2]
 
         if (layoutName.indexOf(fileExtension) === -1) {
           assetPath += '/default' + fileExtension
@@ -257,7 +246,7 @@ function peregrine (options) {
         }
 
         try {
-          let fileContent = fs.readFileSync(resolvedPath, 'utf8')
+          const fileContent = fs.readFileSync(resolvedPath, 'utf8')
           template = template.replace(snippet, fileContent)
 
           if (this.relatedFiles.indexOf(resolvedPath) === -1) {
@@ -283,7 +272,7 @@ function peregrine (options) {
   }
 
   this.readModuleTemplate = (templatePath, callback) => {
-    let errorText = `
+    const errorText = `
     <div style="margin:10px;padding:10px;background:#fff;color:#e00;font-size:16px;border:2px solid black;">
       Component Template: <br />
       <b>"${templatePath}"</b><br />
@@ -305,7 +294,7 @@ function peregrine (options) {
         callback(fileCache[filename])
       } else {
         try {
-          let fileContent = fs.readFileSync(filename, 'utf8')
+          const fileContent = fs.readFileSync(filename, 'utf8')
           fileCache[filename] = fileContent
           callback(fileContent)
         } catch (e) {
@@ -326,7 +315,7 @@ function peregrine (options) {
       if (this.config.globalSeed) {
         globalSeed = this.config.globalSeed
 
-        let genNavs = {}
+        const genNavs = {}
         this.config.pages.map(page => {
           if (page.navigation) {
             if (!genNavs[page.navigation]) {
@@ -349,12 +338,7 @@ function peregrine (options) {
   this.prevTimestamps = {}
 
   let initialInsert = true
-  let insertAssets = (html, inline) => {
-    // if (options.webpack === false) {
-    //   return html
-    // }
-    // return html
-
+  const insertAssets = (html, inline) => {
     if (initialInsert) {
       // this.purify()
       initialInsert = false
@@ -367,7 +351,7 @@ function peregrine (options) {
 
     if (this.compilation) {
       Object.keys(this.compilation.assets).forEach(file => {
-        let asset = this.compilation.assets[file]
+        const asset = this.compilation.assets[file]
 
         if (file.endsWith('.js')) {
           assets.js[file] = asset.source()
@@ -381,7 +365,7 @@ function peregrine (options) {
       fs.writeFileSync(this.tempFile, JSON.stringify(assets))
     } else {
       if (fs.existsSync(this.tempFile)) {
-        let tempFileContent = fs.readFileSync(this.tempFile)
+        const tempFileContent = fs.readFileSync(this.tempFile)
         assets = JSON.parse(tempFileContent)
       } else {
         console.log('Temp file not found: ' + this.tempFile + ' \n |- Run "yarn build" to create it')
@@ -391,98 +375,51 @@ function peregrine (options) {
     // console.log(assets)
 
     if (html.indexOf('{{insert_scripts}}') !== -1) {
-      let scripts = []
+      const scripts = []
 
       Object.keys(assets.js).forEach(file => {
         scripts.push('<script type="text/javascript" src="/' + file + '"></script>')
       })
 
       html = html.replace('{{insert_scripts}}', scripts.join(''))
-
-      // let assetSources = []
-      // assetSources.reverse()
-
-      // if (inline && file.indexOf('crit.') !== -1 && options.env === 'production') {
-      //   let fileContent = asset.source()
-      //   assetSources.push('<script type="text/javascript">' + fileContent + '</script>')
-      // }
-      // assetSources.push('<script type="text/javascript" async src="/' + file + '"></script>')
-
-      // html = html.replace('{{insert_scripts}}', assetSources.join(''))
     }
 
     if (html.indexOf('{{insert_styles}}') !== -1) {
-      let scripts = []
+      const scripts = []
 
       Object.keys(assets.css).forEach(file => {
         scripts.push('<link rel="stylesheet" href="/' + file + '" />')
       })
 
       html = html.replace('{{insert_styles}}', scripts.join(''))
-
-      // let assetSources = []
-
-      // if (inline) {
-      //   if (file.indexOf('crit.') !== -1) {
-      //     let fileContent = asset.source()
-      //     assetSources.push('<style>' + fileContent + '</style>')
-      //     assetSources.push(`
-      //     <script type="text/javascript">
-      //     window.addEventListener("load", function inject(){
-      //       var f${i} = document.createElement('link');
-      //       f${i}.rel = 'preload';
-      //       f${i}.href = '/${file}';
-      //       f${i}.as = 'style';
-      //       document.getElementsByTagName('head')[0].appendChild(f${i});
-      //     })
-      //     </script>
-      //     `)
-      //   } else {
-      //     assetSources.push(`<script type="text/javascript">
-      //     var f${i} = document.createElement('link');
-      //     f${i}.rel = 'stylesheet';
-      //     f${i}.href = '/${file}';
-      //     f${i}.type = 'text/css';
-      //     document.getElementsByTagName('head')[0].appendChild(f${i});
-      //     </script>`)
-      //   }
-      // } else {
-      //   assetSources.push('<link rel="stylesheet" href="/' + file + '" />')
-      // }
-
-      // assetSources.reverse()
-
-      // html = html.replace('{{insert_styles}}', assetSources.join(''))
     }
 
     return html
   }
 
   this.cleanOldComponentCache = _ => {
-    let now = Date.now()
+    const now = Date.now()
     Object.keys(componentCache).forEach(key => {
-      let date = componentCache[key][0]
+      const date = componentCache[key][0]
       if (now - cacheAge < date) {
         // delete componentCache[key]
       }
     })
   }
 
-  let renderTemplate = (body, seed, cacheName, comp) => {
+  const renderTemplate = (body, seed, cacheName, comp) => {
     let useCacheIfExists = true
 
     if (comp.options) {
       useCacheIfExists = !!comp.options.cache
     }
 
-    let cached = useCacheIfExists ? componentCache[cacheName] || [false, false] : false
-    // let cached = [false, false]
-    let now = Date.now()
+    const cached = useCacheIfExists ? componentCache[cacheName] || [false, false] : false
+    const now = Date.now()
 
     if (cached[0] !== false &&
       now - cacheAge < cached[0]) {
       cached[0] = now
-      // this.log.add('cache used')
 
       return cached[1]
     }
@@ -495,7 +432,6 @@ function peregrine (options) {
         seed = Object.assign({}, globalSeed, seed)
         rendered = ejs.render(body, seed)
 
-        // this.log.add('cache created')
         if (useCacheIfExists) {
           componentCache[cacheName] = [now, rendered]
         }
@@ -508,23 +444,17 @@ function peregrine (options) {
   }
 
   this.renderSingleComponent = (comp, rtfn) => {
-    // let modID = comp.srcFile.split('/')
-    // modID = modID[modID.length - 3] + ' - ' + modID[modID.length - 1]
-    // let modStart = Date.now()
-    // this.log.add('start module ' + modID)
     this.readModuleTemplate(comp.srcFile, body => {
       if (!body) {
         body = ''
       }
 
-      let cacheName = comp.srcFile + '++' + comp.seedFile
-      let seed = Object.assign({}, comp.seedData, comp.addComponentSeed)
-      let seedString = JSON.stringify(seed)
-      let hash = encrypt(seedString, 'secret').words.join('')
+      const cacheName = comp.srcFile + '++' + comp.seedFile
+      const seed = Object.assign({}, comp.seedData, comp.addComponentSeed)
+      const seedString = JSON.stringify(seed)
+      const hash = encrypt(seedString, 'secret').words.join('')
 
-      let rendered = renderTemplate(body, seed, cacheName + '--' + hash, comp)
-
-      // this.log.add('fin module ' + modID + ' - ' + (Date.now() - modStart + 'ms'))
+      const rendered = renderTemplate(body, seed, cacheName + '--' + hash, comp)
 
       if (rtfn) {
         rtfn(rendered)
@@ -535,22 +465,18 @@ function peregrine (options) {
   }
 
   this.renderComponents = (componentsObjects, modulesDone) => {
-    let combinedHTML = []
-    let comps = componentsObjects
-    let sync = true
+    const combinedHTML = []
+    const comps = componentsObjects
+    const sync = true
 
     let compsDone = 0
-    let compsTotal = comps.length
+    const compsTotal = comps.length
 
     if (compsTotal) {
       if (!sync) {
         // sync components
-        let compCallback = rendered => {
+        const compCallback = rendered => {
           // Comment before
-          // let commentBefore = '\n<!-- Component START: ' + JSON.stringify(comp) + ' -->\n'
-          // let commentAfter = '\n<!-- Component END: ' + JSON.stringify(comp) + ' -->\n'
-
-          // combinedHTML[compsDone] = commentBefore + rendered + commentAfter
           combinedHTML[compsDone] = rendered
           compsDone++
 
@@ -590,18 +516,13 @@ function peregrine (options) {
   }
 
   this.generatePage = (pageOpts, options, pageDone) => {
-    // const name = pageOpts.name || 'index'
+    const prepend = options.beforeEach.components || []
+    const append = options.afterEach.components || []
 
-    // this.log.add('start page: ' + name)
-    // let pageStart = Date.now()
-
-    let prepend = options.beforeEach.components || []
-    let append = options.afterEach.components || []
-
-    let components = prepend.concat(pageOpts.components).concat(append)
+    const components = prepend.concat(pageOpts.components).concat(append)
 
     // generate componentsObjects
-    let componentsObjects = components.map(comp => {
+    const componentsObjects = components.map(comp => {
       let name = comp
       let variant = 'default'
       let addComponentSeed = {}
@@ -614,14 +535,14 @@ function peregrine (options) {
       }
 
       if (name.indexOf('/') !== -1) {
-        let nameSplit = name.split('/')
+        const nameSplit = name.split('/')
         name = nameSplit[0]
         variant = nameSplit[nameSplit.length - 1]
       }
 
-      let base = path.join(__dirname, '../' + componentsPath) + name
+      const base = path.join(__dirname, '../' + componentsPath) + name
 
-      let rt = {
+      const rt = {
         name,
         addComponentSeed,
         srcFile: base + '/templates/' + variant + fileExtension,
@@ -630,8 +551,8 @@ function peregrine (options) {
       }
 
       // check if template file exists
-      let tmpFileExists = fs.existsSync(rt.srcFile)
-      let seedFileExists = fs.existsSync(rt.seedFile)
+      const tmpFileExists = fs.existsSync(rt.srcFile)
+      const seedFileExists = fs.existsSync(rt.seedFile)
 
       if (!tmpFileExists) {
         console.log('\n\'' + rt.srcFile + '\'', 'was not found')
@@ -656,7 +577,7 @@ function peregrine (options) {
 
     this.renderComponents(componentsObjects, (allHTML) => {
       let distPath = path.join(__dirname, '../dist/')
-      let fileExtension = (options.fileExtension || 'html')
+      const fileExtension = (options.fileExtension || 'html')
 
       if (pageOpts.index !== true) {
         if (!fs.existsSync(distPath + pageOpts.route)) {
@@ -664,8 +585,6 @@ function peregrine (options) {
         }
         distPath += pageOpts.route + '/'
       }
-
-      // this.log.add('page done ' + name + ' - ' + (Date.now() - pageStart) + 'ms')
 
       allHTML = insertAssets(allHTML, pageOpts.index)
 
@@ -677,7 +596,7 @@ function peregrine (options) {
           console.log('error writing file', distPath)
           return
         }
-        let writeFile = distPath + 'index.' + fileExtension
+        const writeFile = distPath + 'index.' + fileExtension
         fs.writeFile(writeFile, html, 'utf8', _ => {})
         pageDone()
       })
@@ -692,11 +611,6 @@ function peregrine (options) {
   }
 
   this.generatePages = done => {
-    // gernerate pages
-    // this.compilation.assets.forEach((asset) => {
-    //   console.log(asset)
-    // })
-
     const conf = this.config
     const options = conf.options || {}
     const pages = conf.pages || []
@@ -706,7 +620,6 @@ function peregrine (options) {
       this.generatePage(page, options, _ => {
         pagesDone++
         if (pagesDone === pages.length) {
-          // this.log.print()
           done()
         }
       })
@@ -722,16 +635,13 @@ peregrine.prototype.apply = function (compiler) {
   this.distPath = compiler.options.output.path
 
   compiler.plugin('emit', function (compilation, callback) {
-    let directory = path.join(__dirname, '../dist')
+    const directory = path.join(__dirname, '../dist')
     if (!fs.existsSync(directory)) {
       fs.mkdirSync(directory)
     } else {
-      // deleteFolderRecursive(directory)
-      // fs.mkdirSync(directory)
     }
 
     fs.readdir(directory, (err, files) => {
-      // this.log.clear()
       if (err) throw err
 
       if (initialBuild) {
@@ -739,7 +649,6 @@ peregrine.prototype.apply = function (compiler) {
         // delete dist repository
         if (fs.existsSync(directory)) {
           rimraf.sync(directory)
-          // shell.rm('-rf', directory)
           fs.mkdirSync(directory)
         }
       }

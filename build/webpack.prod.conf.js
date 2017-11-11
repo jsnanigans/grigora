@@ -193,7 +193,6 @@ var webpackConfig = merge(baseWebpackConfig, {
     // }),
 
     new peregrine({
-      // config: path.join(__dirname, '/../peregrine.js')
       config: path.join(__dirname, '../src/pages.js'),
       setPaths: paths => {
         assetPaths = paths
