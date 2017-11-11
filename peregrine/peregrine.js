@@ -36,9 +36,14 @@ const fileCache = {}
 function peregrine (options) {
   // this.options = options
   this.configFile = options.config || false
-  this.tempFile = path.join(__dirname, '.peregrine.temp.js')
+  this.tempDir = path.join(__dirname, '.peregrine-temp')
+  this.tempFile = path.join(this.tempDir, 'data.json')
   this.config = {}
   this.relatedFiles = []
+
+  if (!fs.existsSync(this.tempDir)) {
+    fs.mkdirSync(this.tempDir)
+  }
 
   this.log = {
     log: '',
@@ -125,6 +130,8 @@ function peregrine (options) {
           return rt
         })
 
+        let jsAssetsTempFile = path.join(this.tempDir, 'purify-js-assets.js')
+
         let assetsToPurify = allAssets.filter(o => o.name.endsWith('.css'))
         let assetsToInclude = allAssets.filter(o => o.name.endsWith('.js'))
 
@@ -132,6 +139,8 @@ function peregrine (options) {
           return asset.children[0].source()
           // return path.join(__dirname, '../src')
         })
+
+        fs.writeFileSync(jsAssetsTempFile, assetsToInclude, 'utf8')
 
         assetsToPurify.forEach(asset => {
           let name = asset.name
@@ -154,20 +163,20 @@ function peregrine (options) {
 
           // console.log(sourceAssets)
 
-          // sourceAssets.push('<script>' + assetsToInclude.join(';') + '</script>')
+          sourceAssets.push(jsAssetsTempFile)
 
-          this.compilation.assets[name] = new WPS.ConcatSource(
-            purify(
-              sourceAssets,
-              // componentHTML + '<script>' + assetsToInclude.join(';') + '</script>',
-              // '<div class="xxl/span-4"></div>',
-              asset.source(),
-              {
-                // minify: true
-                // info: true
-              }
-            )
+          let purified = purify(
+            sourceAssets,
+            asset.source(),
+            {
+              minify: true
+              // info: true
+            }
           )
+
+          purified = purified.replace(/\//g, '\\/')
+
+          this.compilation.assets[name] = new WPS.ConcatSource(purified)
 
           wasMinified.push(name)
         })
