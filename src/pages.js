@@ -2,7 +2,6 @@ const faker = require('faker')
 
 module.exports = {
   globalSeed: {
-    navigation: [],
     faker
   },
 
@@ -16,8 +15,17 @@ module.exports = {
       components: ['_foot']
     }
   },
+
+  navigation: {
+    'main': {
+      'main-page': {},
+      'test_contact': {},
+      'color-demo': {}
+    }
+  },
+
   pages: {
-    'index': {
+    'main-page': {
       name: 'Home',
       index: true,
       components: [

@@ -311,24 +311,53 @@ function peregrine (options) {
       this.config = require(this.configFile)
       if (this.config.globalSeed) {
         globalSeed = this.config.globalSeed
+        this.generateNavigations()
 
         // const genNavs = {}
         // this.config.pages.map(page => {
-          // if (page.navigation) {
-          //   if (!genNavs[page.navigation]) {
-          //     genNavs[page.navigation] = []
-          //   }
+        // if (page.navigation) {
+        //   if (!genNavs[page.navigation]) {
+        //     genNavs[page.navigation] = []
+        //   }
 
-          //   genNavs[page.navigation].push({
-          //     name: page.name,
-          //     slug: page.index ? '/' : '/' + page.route
-          //   })
-          // }
+        //   genNavs[page.navigation].push({
+        //     name: page.name,
+        //     slug: page.index ? '/' : '/' + page.route
+        //   })
+        // }
         // })
 
         // globalSeed.generatedNavigation = genNavs
       }
     }
+  }
+
+  this.generateNavigations = _ => {
+    const navs = this.config.navigation
+
+    // if (!this.config.globalSeed) { this.config.globalSeed = {} }
+    this.config.globalSeed.autoNav = {}
+
+    const genTree = tree => {
+      const generated = []
+
+      Object.keys(tree).forEach(item => {
+        const page = this.config.pages[item]
+        if (page) {
+          generated.push({
+            name: page.name,
+            slug: page.slug || page.name.toLowerCase().replace('/ /', '-')
+          })
+        }
+      })
+
+      return generated
+    }
+
+    Object.keys(navs).forEach(nav => {
+      const tree = navs[nav]
+      this.config.globalSeed.autoNav[nav] = genTree(tree)
+    })
   }
 
   this.startTime = Date.now()
@@ -629,7 +658,6 @@ function peregrine (options) {
 
       return page
     })
-    console.log(pages)
 
     let pagesDone = 0
     pages.forEach(page => {
