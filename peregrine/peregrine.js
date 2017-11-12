@@ -145,9 +145,16 @@ function peregrine (options) {
             return
           }
 
-          const sourceAssets = Object.keys(componentCache)
+          const componentTemplates = Object.keys(componentCache)
             .map(key => key.split('++')[0])
             .filter(file => fs.existsSync(file))
+
+          const otherTemplates = Object.keys(componentAssets)
+            .filter((v, i, a) => a.indexOf(v) === i)
+            .map(key => key)
+            .filter(file => fs.existsSync(file))
+
+          const sourceAssets = otherTemplates.concat(componentTemplates)
 
           sourceAssets.push(jsAssetsTempFile)
 
