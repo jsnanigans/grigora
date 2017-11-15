@@ -158,7 +158,7 @@ function peregrine (options) {
 
           sourceAssets.push(jsAssetsTempFile)
 
-          let purified = purify(
+          const purified = purify(
             sourceAssets,
             asset.source(),
             {
@@ -166,8 +166,6 @@ function peregrine (options) {
               // info: true
             }
           )
-
-          purified = purified.replace(/\//g, '\\/')
 
           this.compilation.assets[name] = new WPS.ConcatSource(purified)
 
