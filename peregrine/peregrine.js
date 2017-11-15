@@ -8,6 +8,10 @@ const encrypt = require('crypto-js/md5')
 const tidy = require('htmltidy').tidy
 const purify = require('purifycss-extended')
 
+// lib includes
+const useTag = require('./lib/parseOptionUseTag')
+
+// variable definitions
 const logEnabled = false
 let showErrors = false
 
@@ -91,8 +95,7 @@ function peregrine (options) {
     options.setPaths(usedTemplates)
   }
 
-  const layoutTemplateRegex = /\{\{+(layout) '+(.*)'\}\}/g
-  const partTemplateRegex = /\{\{+(part) '+(.*)'\}\}/g
+  const includeOptions = /\{\{(use)+((.|\n)*)\}\}/g
 
   this.parseAssetPath = assetPath => {
     const basePath = path.join(__dirname, '../src')
@@ -179,86 +182,89 @@ function peregrine (options) {
   this.includeLayouts = (template, cacheName) => {
     let match
     do {
-      match = layoutTemplateRegex.exec(template)
+      match = includeOptions.exec(template)
       if (match) {
-        const snippet = match[0]
-        let assetPath = match[1]
-        const layoutName = match[2]
+        // const code = match[0]
+        const use = useTag.parse(match, 'component')
+        console.log(use)
+        // const snippet = match[0]
+        // let assetPath = match[1]
+        // const layoutName = match[2]
 
-        if (layoutName.indexOf(fileExtension) === -1) {
-          assetPath += '/default' + fileExtension
-        }
+        // if (layoutName.indexOf(fileExtension) === -1) {
+        //   assetPath += '/default' + fileExtension
+        // }
 
-        let resolvedPath = this.parseAssetPath(assetPath) + '/' + layoutName
+        // let resolvedPath = this.parseAssetPath(assetPath) + '/' + layoutName
 
-        if (layoutName.indexOf('/') === -1) {
-          resolvedPath += '/default' + fileExtension
-        } else {
-          resolvedPath += fileExtension
-        }
+        // if (layoutName.indexOf('/') === -1) {
+        //   resolvedPath += '/default' + fileExtension
+        // } else {
+        //   resolvedPath += fileExtension
+        // }
 
-        if (typeof componentAssets[resolvedPath] === 'undefined') {
-          componentAssets[resolvedPath] = []
-        }
-        if (componentAssets[resolvedPath].indexOf(cacheName) === -1) {
-          componentAssets[resolvedPath].push(cacheName)
-        }
+        // if (typeof componentAssets[resolvedPath] === 'undefined') {
+        //   componentAssets[resolvedPath] = []
+        // }
+        // if (componentAssets[resolvedPath].indexOf(cacheName) === -1) {
+        //   componentAssets[resolvedPath].push(cacheName)
+        // }
 
-        try {
-          const fileContent = fs.readFileSync(resolvedPath, 'utf8')
-          template = template.replace(snippet, fileContent)
+        // try {
+        //   const fileContent = fs.readFileSync(resolvedPath, 'utf8')
+        //   template = template.replace(snippet, fileContent)
 
-          if (this.relatedFiles.indexOf(resolvedPath) === -1) {
-            this.relatedFiles.push(resolvedPath)
-          }
-        } catch (e) {
-          console.log('NOT FOUND: ' + assetPath, resolvedPath)
-        }
+        //   if (this.relatedFiles.indexOf(resolvedPath) === -1) {
+        //     this.relatedFiles.push(resolvedPath)
+        //   }
+        // } catch (e) {
+        //   console.log('NOT FOUND: ' + assetPath, resolvedPath)
+        // }
       }
     } while (match)
 
     return template
   }
   this.includeParts = (template, cacheName) => {
-    let match
-    do {
-      match = partTemplateRegex.exec(template)
-      if (match) {
-        const snippet = match[0]
-        let assetPath = match[1]
-        const layoutName = match[2]
+    // let match
+    // do {
+    //   match = partTemplateRegex.exec(template)
+    //   if (match) {
+    //     const snippet = match[0]
+    //     let assetPath = match[1]
+    //     const layoutName = match[2]
 
-        if (layoutName.indexOf(fileExtension) === -1) {
-          assetPath += '/default' + fileExtension
-        }
+    //     if (layoutName.indexOf(fileExtension) === -1) {
+    //       assetPath += '/default' + fileExtension
+    //     }
 
-        let resolvedPath = this.parseAssetPath(assetPath) + '/' + layoutName
+    //     let resolvedPath = this.parseAssetPath(assetPath) + '/' + layoutName
 
-        if (layoutName.indexOf('/') === -1) {
-          resolvedPath += '/default' + fileExtension
-        } else {
-          resolvedPath += fileExtension
-        }
+    //     if (layoutName.indexOf('/') === -1) {
+    //       resolvedPath += '/default' + fileExtension
+    //     } else {
+    //       resolvedPath += fileExtension
+    //     }
 
-        if (typeof componentAssets[resolvedPath] === 'undefined') {
-          componentAssets[resolvedPath] = []
-        }
-        if (componentAssets[resolvedPath].indexOf(cacheName) === -1) {
-          componentAssets[resolvedPath].push(cacheName)
-        }
+    //     if (typeof componentAssets[resolvedPath] === 'undefined') {
+    //       componentAssets[resolvedPath] = []
+    //     }
+    //     if (componentAssets[resolvedPath].indexOf(cacheName) === -1) {
+    //       componentAssets[resolvedPath].push(cacheName)
+    //     }
 
-        try {
-          const fileContent = fs.readFileSync(resolvedPath, 'utf8')
-          template = template.replace(snippet, fileContent)
+    //     try {
+    //       const fileContent = fs.readFileSync(resolvedPath, 'utf8')
+    //       template = template.replace(snippet, fileContent)
 
-          if (this.relatedFiles.indexOf(resolvedPath) === -1) {
-            this.relatedFiles.push(resolvedPath)
-          }
-        } catch (e) {
-          console.log('NOT FOUND: ' + assetPath, resolvedPath)
-        }
-      }
-    } while (match)
+    //       if (this.relatedFiles.indexOf(resolvedPath) === -1) {
+    //         this.relatedFiles.push(resolvedPath)
+    //       }
+    //     } catch (e) {
+    //       console.log('NOT FOUND: ' + assetPath, resolvedPath)
+    //     }
+    //   }
+    // } while (match)
 
     return template
   }
