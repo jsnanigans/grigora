@@ -9,7 +9,7 @@ const tidy = require('htmltidy').tidy
 const purify = require('purifycss-extended')
 
 // lib includes
-const useTag = require('./lib/parseOptionUseTag')
+const useTag = require('./lib/optionUseTag')
 
 // variable definitions
 const logEnabled = false
