@@ -95,7 +95,7 @@ function peregrine (options) {
     options.setPaths(usedTemplates)
   }
 
-  const includeOptions = /\{\{(use)+((.|\n)*)\}\}/g
+  const includeOptions = /\{\{(use)+((.|\n)*?)\}\}/g
 
   this.parseAssetPath = assetPath => {
     const basePath = path.join(__dirname, '../src')
@@ -184,42 +184,36 @@ function peregrine (options) {
     do {
       match = includeOptions.exec(template)
       if (match) {
-        // const code = match[0]
+        const code = match[0]
+
+        // remove option code
+        template = template.replace(code, '')
+
+        // parse option
         const use = useTag.parse(match, 'component')
-        console.log(use)
-        // const snippet = match[0]
-        // let assetPath = match[1]
-        // const layoutName = match[2]
 
-        // if (layoutName.indexOf(fileExtension) === -1) {
-        //   assetPath += '/default' + fileExtension
-        // }
+        // loop each tag in option
+        use.forEach(option => {
+          // register component in cache and for watch
+          if (typeof componentAssets[option.assetPath] === 'undefined') {
+            componentAssets[option.assetPath] = []
+          }
+          if (componentAssets[option.assetPath].indexOf(cacheName) === -1) {
+            componentAssets[option.assetPath].push(cacheName)
+          }
+          if (this.relatedFiles.indexOf(option.assetPath) === -1) {
+            this.relatedFiles.push(option.assetPath)
+          }
 
-        // let resolvedPath = this.parseAssetPath(assetPath) + '/' + layoutName
+          // replace tag
+          /*eslint no-control-regex: 0*/
+          const tag = option.tag;
+          const tagRegexp = new RegExp(`((\<${tag})((.|\n)*?)\>((.|\n)*?)(\<\/${tag}\>)|\<${tag}((.|\n)*?)\/\>)`, 'gm')
 
-        // if (layoutName.indexOf('/') === -1) {
-        //   resolvedPath += '/default' + fileExtension
-        // } else {
-        //   resolvedPath += fileExtension
-        // }
+          template = template.replace(tagRegexp, option.content)
+        })
 
-        // if (typeof componentAssets[resolvedPath] === 'undefined') {
-        //   componentAssets[resolvedPath] = []
-        // }
-        // if (componentAssets[resolvedPath].indexOf(cacheName) === -1) {
-        //   componentAssets[resolvedPath].push(cacheName)
-        // }
-
-        // try {
-        //   const fileContent = fs.readFileSync(resolvedPath, 'utf8')
-        //   template = template.replace(snippet, fileContent)
-
-        //   if (this.relatedFiles.indexOf(resolvedPath) === -1) {
-        //     this.relatedFiles.push(resolvedPath)
-        //   }
-        // } catch (e) {
-        //   console.log('NOT FOUND: ' + assetPath, resolvedPath)
-        // }
+        // template = template.replace(snippet, fileContent)
       }
     } while (match)
 

@@ -1,5 +1,8 @@
-const printErr = (err, pathArray) => {
-  console.error('\n' + pathArray.join('.'))
+const fs = require('fs')
+const path = require('path')
+
+const printErr = (err, data = '') => {
+  console.error('\n' + data)
   console.error(err)
   return err
 }
@@ -7,7 +10,7 @@ const printErr = (err, pathArray) => {
 const fileType = 'ejs'
 
 const createPath = pathArray => {
-  const path = []
+  const assetPath = []
   const arr = [...pathArray]
 
   // if there is no teplate defined, use default
@@ -22,10 +25,10 @@ const createPath = pathArray => {
   // 0 = part or layout
   if (arr[0] === 'part' || arr[0] === 'layout') {
     if (arr[0] === 'part') {
-      path.push('03_parts')
+      assetPath.push('03_parts')
     }
     if (arr[0] === 'layout') {
-      path.push('04_layouts')
+      assetPath.push('04_layouts')
     }
   } else {
     return printErr('Firt section must be either "part" or "layout"')
@@ -33,17 +36,26 @@ const createPath = pathArray => {
 
   // 1 = name
   // todo: check if it exists
-  path.push(arr[1])
+  assetPath.push(arr[1])
 
   // 2 = tempalte file
   // todo: check if it exists
-  path.push(arr[2] + '.' + fileType)
+  assetPath.push(arr[2] + '.' + fileType)
 
-  return path.join('/')
+  // return path.join('/')
+  return path.join(__dirname, '../../src/', assetPath.join('/'))
+}
+
+const getContents = assetPath => {
+  if (!fs.existsSync(assetPath)) {
+    return printErr('File does not exists', assetPath)
+  }
+
+  return fs.readFileSync(assetPath, 'utf8')
 }
 
 const parseTag = (match, level) => {
-  const use = {}
+  const use = []
   let opts = []
   for (let i = 0; i < match.length; i++) {
     if (i > 1) {
@@ -54,7 +66,14 @@ const parseTag = (match, level) => {
 
   opts.forEach(optLine => {
     const separated = optLine.split(':')
-    use[separated[0]] = createPath(separated[1].split('.'))
+    const assetPath = createPath(separated[1].split('.'))
+    const content = getContents(assetPath)
+
+    use.push({
+      assetPath,
+      content,
+      tag: separated[0]
+    })
   })
 
   return use
