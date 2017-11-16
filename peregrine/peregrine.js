@@ -211,6 +211,9 @@ function peregrine (options) {
           const tagRegexp = new RegExp(`((\<${tag})((.|\n)*?)\>((.|\n)*?)(\<\/${tag}\>)|\<${tag}((.|\n)*?)\/\>)`, 'gm')
 
           template = template.replace(tagRegexp, option.content)
+
+          // todo: check if all imported modules are used
+          // todo: rename {{use .. }} to something more fitting
         })
       }
     } while (match)
