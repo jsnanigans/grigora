@@ -1,14 +1,19 @@
+{{use
+  dropdown: part.form_inputs.select,
+  text: part.form_inputs.text,
+  btn: part.form_inputs.button
+}}
 <form action="demo">
   <div class="grid">
     <% for (let i = 0; i < inputs.length; i++) {  %>
       <div class="col">
-        {{part 'form_inputs/text'}}
+        <text />
       </div>
     <% }; %>
     <div class="col">
-      {{part 'form_inputs/select'}}
+      <dropdown />
     </div>
   </div>
 
-  {{part 'form_inputs/button'}}
+  <btn />
 </form>

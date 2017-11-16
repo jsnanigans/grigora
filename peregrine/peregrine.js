@@ -207,58 +207,13 @@ function peregrine (options) {
 
           // replace tag
           /*eslint no-control-regex: 0*/
-          const tag = option.tag;
+          const tag = option.tag
           const tagRegexp = new RegExp(`((\<${tag})((.|\n)*?)\>((.|\n)*?)(\<\/${tag}\>)|\<${tag}((.|\n)*?)\/\>)`, 'gm')
 
           template = template.replace(tagRegexp, option.content)
         })
-
-        // template = template.replace(snippet, fileContent)
       }
     } while (match)
-
-    return template
-  }
-  this.includeParts = (template, cacheName) => {
-    // let match
-    // do {
-    //   match = partTemplateRegex.exec(template)
-    //   if (match) {
-    //     const snippet = match[0]
-    //     let assetPath = match[1]
-    //     const layoutName = match[2]
-
-    //     if (layoutName.indexOf(fileExtension) === -1) {
-    //       assetPath += '/default' + fileExtension
-    //     }
-
-    //     let resolvedPath = this.parseAssetPath(assetPath) + '/' + layoutName
-
-    //     if (layoutName.indexOf('/') === -1) {
-    //       resolvedPath += '/default' + fileExtension
-    //     } else {
-    //       resolvedPath += fileExtension
-    //     }
-
-    //     if (typeof componentAssets[resolvedPath] === 'undefined') {
-    //       componentAssets[resolvedPath] = []
-    //     }
-    //     if (componentAssets[resolvedPath].indexOf(cacheName) === -1) {
-    //       componentAssets[resolvedPath].push(cacheName)
-    //     }
-
-    //     try {
-    //       const fileContent = fs.readFileSync(resolvedPath, 'utf8')
-    //       template = template.replace(snippet, fileContent)
-
-    //       if (this.relatedFiles.indexOf(resolvedPath) === -1) {
-    //         this.relatedFiles.push(resolvedPath)
-    //       }
-    //     } catch (e) {
-    //       console.log('NOT FOUND: ' + assetPath, resolvedPath)
-    //     }
-    //   }
-    // } while (match)
 
     return template
   }
@@ -267,8 +222,6 @@ function peregrine (options) {
     let tmp = template
 
     tmp = this.includeLayouts(tmp, cacheName)
-    tmp = this.includeParts(tmp, cacheName)
-    // tmp = this.includeTemplates(tmp, cacheName)
 
     return tmp
   }
