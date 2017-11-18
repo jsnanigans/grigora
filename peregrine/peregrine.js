@@ -7,6 +7,7 @@ const rimraf = require('rimraf')
 const encrypt = require('crypto-js/md5')
 const tidy = require('htmltidy').tidy
 const purify = require('purifycss-extended')
+const classGenerator = require('../src/02_styles/generators/_generate')
 
 // lib includes
 const useTag = require('./lib/optionUseTag')
@@ -307,7 +308,7 @@ function peregrine (options) {
         if (page) {
           generated.push({
             name: page.name,
-            slug: page.slug || page.name.toLowerCase().replace('/ /', '-')
+            slug: '/' + (page.slug || page.name.toLowerCase().replace('/ /', '-'))
           })
         }
       })
@@ -640,6 +641,10 @@ let initialBuild = true
 
 peregrine.prototype.apply = function (compiler) {
   this.distPath = compiler.options.output.path
+
+  compiler.plugin('compilation', function () {
+    classGenerator.generate()
+  })
 
   compiler.plugin('emit', function (compilation, callback) {
     const directory = path.join(__dirname, '../dist')
