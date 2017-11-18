@@ -7,11 +7,11 @@ $color := {
 }
 
 for i in (1..3)
-  $color['secondary_l' + i] = lighten($color.secondary, i * 8)
+  $color['secondary_l' + i] = lighten($color.secondary, i * 3)
 for i in (1..3)
-  $color['secondary_d' + i] = darken($color.secondary, i * 8)
+  $color['secondary_d' + i] = darken($color.secondary, i * 3)
 
 for i in (1..3)
-  $color['primary_l' + i] = lighten($color.primary, i * 8)
+  $color['primary_l' + i] = lighten($color.primary, i * 3)
 for i in (1..3)
-  $color['primary_d' + i] = darken($color.primary, i * 8)
+  $color['primary_d' + i] = darken($color.primary, i * 3)
