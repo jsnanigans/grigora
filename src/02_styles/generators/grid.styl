@@ -1,9 +1,17 @@
 +responsive()
   &span
-    for num in (1..$layout.cols)
-      &-{num}
-        span(num/12)
+    for num in (0..$layout.cols)
+      if num != 0
+        &-{num}
+          span(num/12)
+      else
+        &-auto
+          width: auto
   &col
-    for num in (1..$layout.cols)
-      &-{num}
-        column(num/12, $gutter: $layout.gutter)
+    for num in (0..$layout.cols)
+      if num != 0
+        &-{num}
+          column(num/12, $gutter: $layout.gutter)
+      else
+        &-auto
+          width: auto
