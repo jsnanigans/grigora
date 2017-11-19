@@ -209,8 +209,14 @@ function peregrine (options) {
           // replace tag
           /*eslint no-control-regex: 0*/
           const tag = option.tag
-          const tagRegexp = new RegExp(`((\<${tag})((.|\n)*?)\>((.|\n)*?)(\<\/${tag}\>)|\<${tag}((.|\n)*?)\/\>)`, 'gm')
 
+          // remove ejs tags
+          template = template.replace(/\<\%/g, '---ejs')
+          template = template.replace(/\%\>/g, 'ejs---')
+
+          const tagRegexp = new RegExp(`<${tag}([^>]*)>(.*?)<\/${tag}>`, 'ig')
+
+          // insert snippet
           template = template.replace(tagRegexp, option.content)
 
           // todo: check if all imported modules are used
@@ -218,6 +224,11 @@ function peregrine (options) {
         })
       }
     } while (match)
+
+
+    // add ejs tags again
+    template = template.replace(/---ejs/g, '<%')
+    template = template.replace(/ejs---/g, '%>')
 
     return template
   }
@@ -335,7 +346,6 @@ function peregrine (options) {
       css: {},
       js: {}
     }
-    let critJS = false
 
     if (this.compilation) {
       Object.keys(this.compilation.assets).forEach(file => {
