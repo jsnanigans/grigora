@@ -335,6 +335,7 @@ function peregrine (options) {
       css: {},
       js: {}
     }
+    let critJS = false
 
     if (this.compilation) {
       Object.keys(this.compilation.assets).forEach(file => {
@@ -364,6 +365,11 @@ function peregrine (options) {
 
       Object.keys(assets.js).forEach(file => {
         scripts.push('<script type="text/javascript" src="/' + file + '"></script>')
+
+        // if (file.indexOf('crit.') !== -1) {
+        //   scripts.push('<script type="text/javascript">' + assets.js[file] + '</script>')
+        // } else {
+        // }
       })
 
       html = html.replace('{{insert_scripts}}', scripts.join(''))
@@ -374,7 +380,14 @@ function peregrine (options) {
 
       Object.keys(assets.css).forEach(file => {
         if (file.indexOf('crit.') !== -1) {
-          scripts.push(`<style>${assets.css[file]}</style>`)
+          const purified = purify(
+            html,
+            assets.css[file],
+            {
+              minify: true
+            }
+          )
+          scripts.push(`<style>${purified}</style>`)
         } else {
           scripts.push(`<link rel="stylesheet" href="/${file}" media="none" onload="if(media!='all')media='all'">
           <noscript><link rel="stylesheet" href="/${file}"></noscript>`)
@@ -677,7 +690,6 @@ peregrine.prototype.apply = function (compiler) {
         }
         if (file === this.configFile || this.relatedFiles.indexOf(file) !== -1) {
           this.generatePages(pageList => {
-            this.purify()
             pageList.forEach(page => {
               const html = this.insertAssets(page.content)
               fs.writeFileSync(page.file, html, 'utf8')
