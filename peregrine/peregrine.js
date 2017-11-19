@@ -207,8 +207,7 @@ function peregrine (options) {
           }
 
           // replace tag
-          const tag = option.tag
-          template = useTag.insertSnippet(tag, template)
+          template = useTag.insertSnippet(option, template)
 
           // insert snippet
 

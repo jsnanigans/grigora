@@ -80,39 +80,52 @@ const parseTag = (match, level) => {
 }
 
 
-const insertSnippet = (tag, content) => {
+const insertSnippet = (option, template) => {
+  const tag = option.tag
+  let content = option.content
+
   const regexp = new RegExp(`<${tag}([^>]*)>(.*?)<\/${tag}>`, 'ig')
-  const tagReg = new RegExp(`(.*?)="(.*?)"`, 'g')
+  const tagReg = /(\S+)="(.*?)"/gi
 
   // remove ejs tags
-  content = content.replace(/\<\%/g, '---ejs')
-  content = content.replace(/\%\>/g, 'ejs---')
+  template = template.replace(/\<\%/g, '---ejs')
+  template = template.replace(/\%\>/g, 'ejs---')
 
   let match
   do {
-    match = regexp.exec(content)
+    match = regexp.exec(template)
     if (match) {
       const snippet = match[0]
-      const tags = match[1].split(' ')
-        .filter(tag => tag !== '')
-        .map(keyVal => {
-          const key = keyVal.split('=')[0]
-          return {
-            key,
-            val: keyVal.replace(key, '')
-          }
-        })
-      const content = match[2]
+      const tags = match[1]
+      const tagsO = {}
+      const snipContent = match[2]
 
-      console.log(snippet, tags)
+      // parse tags to json
+      let tagsM
+      do {
+        tagsM = tagReg.exec(tags)
+        if (tagsM) {
+          tagsO[tagsM[1]] = tagsM[2]
+        }
+      } while (tagsM)
+
+      Object.keys(tagsO).forEach(key => {
+        content = content.replace(new RegExp(`@${key}`, 'ig'), tagsO[key])
+      })
+      // console.log(option)
+
+      template = template.replace(snippet, content)
     }
   } while (match)
 
-  // add ejs tags again
-  content = content.replace(/---ejs/g, '<%')
-  content = content.replace(/ejs---/g, '%>')
 
-  return content
+  // replace snippet
+
+  // add ejs tags again
+  template = template.replace(/---ejs/g, '<%')
+  template = template.replace(/ejs---/g, '%>')
+
+  return template
 }
 
 module.exports = {

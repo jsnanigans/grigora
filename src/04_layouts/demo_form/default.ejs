@@ -5,9 +5,10 @@
 }}
 <form action="demo">
   <div class="grid">
+    <h1>@name</h1>
     <% for (let i = 0; i < inputs.length; i++) {  %>
       <div class="col">
-        <text placeholder="Text :)"></text>
+        <text placeholder="<%= i + 'Text :)' %>"></text>
       </div>
     <% }; %>
     <div class="col">
