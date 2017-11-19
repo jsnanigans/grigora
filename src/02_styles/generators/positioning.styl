@@ -3,6 +3,7 @@
     display: flex
 
     &-w
+      display: flex
       flex-wrap: wrap
 
     &-c // align content
@@ -10,7 +11,25 @@
       &a
         display: flex
         align-items: center
+
       &h, // horizontal
       &a
         display: flex
         justify-content: center
+
+    &-d // flex direction
+      &-c // column
+        flex-direction: column
+        &r // x-d-cr / column reverse
+          flex-direction: column-reverse
+
+      &-r // row
+        flex-direction: row
+        &r // x-d-rr / row reverse
+          flex-direction: row-reverse
+
+    // flex: 1..12 classes
+    // x-1 ... x-12
+    for num in (1..12)
+      &-{num}
+        flex: num
