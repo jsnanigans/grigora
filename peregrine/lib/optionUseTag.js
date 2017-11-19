@@ -79,6 +79,43 @@ const parseTag = (match, level) => {
   return use
 }
 
+
+const insertSnippet = (tag, content) => {
+  const regexp = new RegExp(`<${tag}([^>]*)>(.*?)<\/${tag}>`, 'ig')
+  const tagReg = new RegExp(`(.*?)="(.*?)"`, 'g')
+
+  // remove ejs tags
+  content = content.replace(/\<\%/g, '---ejs')
+  content = content.replace(/\%\>/g, 'ejs---')
+
+  let match
+  do {
+    match = regexp.exec(content)
+    if (match) {
+      const snippet = match[0]
+      const tags = match[1].split(' ')
+        .filter(tag => tag !== '')
+        .map(keyVal => {
+          const key = keyVal.split('=')[0]
+          return {
+            key,
+            val: keyVal.replace(key, '')
+          }
+        })
+      const content = match[2]
+
+      console.log(snippet, tags)
+    }
+  } while (match)
+
+  // add ejs tags again
+  content = content.replace(/---ejs/g, '<%')
+  content = content.replace(/ejs---/g, '%>')
+
+  return content
+}
+
 module.exports = {
-  parse: parseTag
+  parse: parseTag,
+  insertSnippet
 }

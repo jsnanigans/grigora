@@ -207,28 +207,18 @@ function peregrine (options) {
           }
 
           // replace tag
-          /*eslint no-control-regex: 0*/
           const tag = option.tag
-
-          // remove ejs tags
-          template = template.replace(/\<\%/g, '---ejs')
-          template = template.replace(/\%\>/g, 'ejs---')
-
-          const tagRegexp = new RegExp(`<${tag}([^>]*)>(.*?)<\/${tag}>`, 'ig')
+          template = useTag.insertSnippet(tag, template)
 
           // insert snippet
-          template = template.replace(tagRegexp, option.content)
+
+          // template = template.replace(tagRegexp, option.content)
 
           // todo: check if all imported modules are used
           // todo: rename {{use .. }} to something more fitting
         })
       }
     } while (match)
-
-
-    // add ejs tags again
-    template = template.replace(/---ejs/g, '<%')
-    template = template.replace(/ejs---/g, '%>')
 
     return template
   }
