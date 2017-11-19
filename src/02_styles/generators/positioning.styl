@@ -2,7 +2,7 @@
   &x
     display: flex
 
-    &-w
+    &-wrap
       display: flex
       flex-wrap: wrap
 
@@ -17,16 +17,15 @@
         display: flex
         justify-content: center
 
-    &-d // flex direction
-      &-c // column
-        flex-direction: column
-        &r // x-d-cr / column reverse
-          flex-direction: column-reverse
+    &-col // column
+      flex-direction: column
+      &-r // x-dc-r / column reverse
+        flex-direction: column-reverse
 
-      &-r // row
-        flex-direction: row
-        &r // x-d-rr / row reverse
-          flex-direction: row-reverse
+    &-row // row
+      flex-direction: row
+      &-r // x-dr-r / row reverse
+        flex-direction: row-reverse
 
     // flex: 1..12 classes
     // x-1 ... x-12
