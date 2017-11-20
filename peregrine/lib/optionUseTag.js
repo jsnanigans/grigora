@@ -81,10 +81,11 @@ const parseTag = (match, level) => {
 
 const insertSnippet = (option, template) => {
   const tag = option.tag
-  let content = option.content
+  const contentInitial = option.content
 
   const regexp = new RegExp(`<${tag}([^>]*)>(.*?)<\/${tag}>`, 'ig')
-  const tagReg = /(\S+)="(.*?)"/gi
+  const tagReg = /(\S+)="(.*?)"/g
+  const placeHolderReg = /{{(([a-z]|-|_)*)}}/gmi
 
   // remove ejs tags
   template = template.replace(/\<\%/g, '---ejs')
@@ -94,10 +95,14 @@ const insertSnippet = (option, template) => {
   do {
     match = regexp.exec(template)
     if (match) {
+      let content = contentInitial
       const snippet = match[0]
       const tags = match[1]
-      const tagsO = {}
-      const snipContent = match[2] || ''
+      const snipContent = match[2]
+
+      const tagsO = {
+        content: snipContent
+      }
 
       // parse tags to json
       let tagsM
@@ -108,18 +113,26 @@ const insertSnippet = (option, template) => {
         }
       } while (tagsM)
 
-      Object.keys(tagsO).forEach(key => {
-        content = content.replace(new RegExp(`@${key}`, 'ig'), tagsO[key])
-      })
-      content = content.replace(new RegExp(`@content`, 'ig'), snipContent)
+      // repalce placeholders {{xx}}
+      let contentWithValues = content
+      let placeHolderM
+      do {
+        placeHolderM = placeHolderReg.exec(content)
+        if (placeHolderM) {
+          const variable = placeHolderM[1]
+          const insert = tagsO[variable] || ''
+
+          contentWithValues = contentWithValues.replace(placeHolderM[0], insert)
+        }
+      } while (placeHolderM)
+
+      content = contentWithValues
 
       template = template.replace(snippet, content)
     }
   } while (match)
 
   // replace snippet
-
-  // add ejs tags again
   template = template.replace(/---ejs/g, '<%')
   template = template.replace(/ejs---/g, '%>')
 
