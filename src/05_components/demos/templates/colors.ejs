@@ -1,29 +1,31 @@
-<h2>Color</h2>
-<div class="x">
-  <div class="x-1 pa-1 c-bg-secondary_d3">.c-bg-secondary_d3</div>
-  <div class="x-1 pa-1 c-bg-secondary_d2">.c-bg-secondary_d2</div>
-  <div class="x-1 pa-1 c-bg-secondary_d1">.c-bg-secondary_d1</div>
-  <div class="x-1 pa-1 c-bg-secondary">.c-bg-secondary</div>
-  <div class="x-1 pa-1 c-bg-secondary_l1">.c-bg-secondary_l1</div>
-  <div class="x-1 pa-1 c-bg-secondary_l2">.c-bg-secondary_l2</div>
-  <div class="x-1 pa-1 c-bg-secondary_l3">.c-bg-secondary_l3</div>
-</div>
-<div class="x">
-    <div class="x-1 pa-1 c-bg-primary_d3">.c-bg-primary_d3</div>
-    <div class="x-1 pa-1 c-bg-primary_d2">.c-bg-primary_d2</div>
-    <div class="x-1 pa-1 c-bg-primary_d1">.c-bg-primary_d1</div>
-    <div class="x-1 pa-1 c-bg-primary">.c-bg-primary</div>
-    <div class="x-1 pa-1 c-bg-primary_l1">.c-bg-primary_l1</div>
-    <div class="x-1 pa-1 c-bg-primary_l2">.c-bg-primary_l2</div>
-    <div class="x-1 pa-1 c-bg-primary_l3">.c-bg-primary_l3</div>
-</div>
-<div class="x">
-    <% for (let i = 0; i <= 20; i++) { %>
-      <div class="x-1 pa-1 c-bg-gray<%= i * 5 %>">c-bg-gray<%= i * 5 %></div>
-    <% } %>
-</div>
-<div class="x">
-    <% for (let i = 0; i <= 20; i++) { %>
-      <div class="x-1 pa-1 c-bg-opaq<%= i * 5 %>">c-bg-opaq<%= i * 5 %></div>
-    <% } %>
+<div class="demo">
+  <h2>Color</h2>
+  <div class="x">
+    <div class="x-1 pa-1 c-bg-secondary_d3 c-text-auto">secondary_d3</div>
+    <div class="x-1 pa-1 c-bg-secondary_d2 c-text-auto">secondary_d2</div>
+    <div class="x-1 pa-1 c-bg-secondary_d1 c-text-auto">secondary_d1</div>
+    <div class="x-1 pa-1 c-bg-secondary c-text-auto">secondary</div>
+    <div class="x-1 pa-1 c-bg-secondary_l1 c-text-auto">secondary_l1</div>
+    <div class="x-1 pa-1 c-bg-secondary_l2 c-text-auto">secondary_l2</div>
+    <div class="x-1 pa-1 c-bg-secondary_l3 c-text-auto">secondary_l3</div>
+  </div>
+  <div class="x">
+      <div class="x-1 pa-1 c-bg-primary_d3 c-text-auto">primary_d3</div>
+      <div class="x-1 pa-1 c-bg-primary_d2 c-text-auto">primary_d2</div>
+      <div class="x-1 pa-1 c-bg-primary_d1 c-text-auto">primary_d1</div>
+      <div class="x-1 pa-1 c-bg-primary c-text-auto">primary</div>
+      <div class="x-1 pa-1 c-bg-primary_l1 c-text-auto">primary_l1</div>
+      <div class="x-1 pa-1 c-bg-primary_l2 c-text-auto">primary_l2</div>
+      <div class="x-1 pa-1 c-bg-primary_l3 c-text-auto">primary_l3</div>
+  </div>
+  <div class="x">
+      <% for (let i = 0; i <= 20; i++) { %>
+        <div class="x-1 pa-1 c-bg-gray<%= i * 5 %> c-text-auto">gray<%= i * 5 %></div>
+      <% } %>
+  </div>
+  <div class="x">
+      <% for (let i = 0; i <= 20; i++) { %>
+        <div class="x-1 pa-1 c-bg-opaq<%= i * 5 %> c-text-auto">opaq<%= i * 5 %></div>
+      <% } %>
+  </div>
 </div>

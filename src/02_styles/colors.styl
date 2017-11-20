@@ -4,6 +4,12 @@
       &-{color}
         background: $color[color]
 
+        &.c-text-auto
+          if contrast($color.dark, $color[color]).ratio > 3.4
+            color: $color.dark
+          else
+            color: $color.light
+
   &-text
     for color in $color
       &-{color}
