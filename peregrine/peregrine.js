@@ -96,7 +96,7 @@ function peregrine (options) {
     options.setPaths(usedTemplates)
   }
 
-  const includeOptions = /\{\{(use)+((.|\n)*?)\}\}/g
+  const includeOptions = /\{\{(define)+((.|\n)*?)\}\}/g
 
   this.parseAssetPath = assetPath => {
     const basePath = path.join(__dirname, '../src')
@@ -214,7 +214,6 @@ function peregrine (options) {
           // template = template.replace(tagRegexp, option.content)
 
           // todo: check if all imported modules are used
-          // todo: rename {{use .. }} to something more fitting
         })
       }
     } while (match)
