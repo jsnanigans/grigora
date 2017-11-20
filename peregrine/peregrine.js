@@ -306,9 +306,16 @@ function peregrine (options) {
       Object.keys(tree).forEach(item => {
         const page = this.config.pages[item]
         if (page) {
+          let slug = '/' + (page.slug || page.name.toLowerCase()
+            .replace('/ /', '-'))
+
+          if (page.index) {
+            slug = '/'
+          }
+
           generated.push({
             name: page.name,
-            slug: '/' + (page.slug || page.name.toLowerCase().replace('/ /', '-'))
+            slug
           })
         }
       })
