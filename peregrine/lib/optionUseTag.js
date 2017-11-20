@@ -79,7 +79,6 @@ const parseTag = (match, level) => {
   return use
 }
 
-
 const insertSnippet = (option, template) => {
   const tag = option.tag
   let content = option.content
@@ -98,7 +97,7 @@ const insertSnippet = (option, template) => {
       const snippet = match[0]
       const tags = match[1]
       const tagsO = {}
-      const snipContent = match[2]
+      const snipContent = match[2] || ''
 
       // parse tags to json
       let tagsM
@@ -112,12 +111,11 @@ const insertSnippet = (option, template) => {
       Object.keys(tagsO).forEach(key => {
         content = content.replace(new RegExp(`@${key}`, 'ig'), tagsO[key])
       })
-      // console.log(option)
+      content = content.replace(new RegExp(`@content`, 'ig'), snipContent)
 
       template = template.replace(snippet, content)
     }
   } while (match)
-
 
   // replace snippet
 

@@ -47,7 +47,7 @@ module.exports = {
             items: 'abcdefghijklmnopqrstuvxyz'.split('')
           }
         },
-        'image/placeholder',
+        // 'image/placeholder',
         'image',
         'image',
         'image',
