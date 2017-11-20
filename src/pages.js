@@ -20,7 +20,7 @@ module.exports = {
     'main': {
       'main-page': {},
       'test_contact': {},
-      'color-demo': {}
+      'demos': {}
     }
   },
 
@@ -62,10 +62,11 @@ module.exports = {
         'contact'
       ]
     },
-    'color-demo': {
-      name: 'Colors',
+    'demos': {
+      name: 'Demo',
       components: [
-        'demos/colors'
+        'demos/colors',
+        'demos/buttons'
       ]
     }
   }

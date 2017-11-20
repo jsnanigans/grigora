@@ -6,70 +6,94 @@ button,
 input[type='button'],
 input[type='reset'],
 input[type='submit']
-	background-color: $color.primary
-	border: .1rem solid $color.primary
-	border-radius: .4rem
-	color: $color.light
-	cursor: pointer
-	display: inline-block
-	font-size: 1.2rem
-	font-weight: 700
-	height: 3.8rem
-	letter-spacing: .1rem
-	line-height: @height
-	padding: 0 3.0rem
-	text-align: center
-	text-decoration: none
-	text-transform: uppercase
-	white-space: nowrap
-	trans: background, color
+  background-color: $color.primary
+  border: .1rem solid $color.primary
+  border-radius: .4rem
+  color: $color.light
+  cursor: pointer
+  display: inline-block
+  font-size: 1.2rem
+  font-weight: 700
+  height: 3.8rem
+  letter-spacing: .1rem
+  line-height: @height
+  padding: 0 3.0rem
+  text-align: center
+  text-decoration: none
+  text-transform: uppercase
+  white-space: nowrap
+  trans: background, color, border
 
-	&:focus,
-	&:hover
-		background-color: $color.secondary
-		border-color: $color.secondary
-		color: $color.light
-		outline: 0
+  &:focus,
+  &:hover
+    background-color: $color.secondary
+    border-color: $color.secondary
+    color: $color.light
+    outline: 0
 
-	&[disabled]
-		cursor: default
-		opacity: .5
+  &.light
+    background-color: $color.light
+    color: $color.primary
 
-		&:focus,
-		&:hover
-			background-color: $color.primary
-			border-color: $color.primary
+    &:focus,
+    &:hover
+      background-color: $color.secondary
+      color: $color.light
 
-	&.button-outline
-		background-color: transparent
-		color: $color.primary
+  &[disabled]
+    cursor: default
+    opacity: .5
 
-		&:focus,
-		&:hover
-			background-color: transparent
-			border-color: $color.secondary
-			color: $color.secondary
+    &:focus,
+    &:hover
+      background-color: $color.primary
+      border-color: $color.primary
 
-		&[disabled]
+  &.outline
+    background-color: transparent
+    color: $color.primary
 
-			&:focus,
-			&:hover
-				border-color: inherit
-				color: $color.primary
+    &:focus,
+    &:hover
+      background-color: transparent
+      border-color: $color.secondary
+      color: $color.secondary
 
-	&.button-clear
-		background-color: transparent
-		border-color: transparent
-		color: $color.primary
+    &[disabled]
+      &:focus,
+      &:hover
+        border-color: inherit
+        color: $color.primary
 
-		&:focus,
-		&:hover
-			background-color: transparent
-			border-color: transparent
-			color: $color.secondary
+    &.light
+      border-color: $color.light
+      color: $color.light
 
-		&[disabled]
+      &:focus,
+      &:hover
+        background-color: transparent
+        border-color: $color.secondary
+        color: $color.secondary
 
-			&:focus,
-			&:hover
-				color: $color.primary
+  &.clear
+    background-color: transparent
+    border-color: transparent
+    color: $color.primary
+
+    &:focus,
+    &:hover
+      background-color: transparent
+      border-color: transparent
+      color: $color.secondary
+
+    &.light
+      color: $color.light
+
+      &:focus,
+      &:hover
+        color: $color.secondary
+
+    &[disabled]
+      &:focus,
+      &:hover
+        color: $color.primary
