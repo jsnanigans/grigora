@@ -1,3 +1,6 @@
+{{use
+  btn: part.form_inputs.button
+}}
 <div class="hero x-cv
   pa-1 m/pa-2">
   <div class="center">
@@ -12,9 +15,10 @@
         <img src="<%= image %>" class="block" />
       </div>
       <div class="m/span-6 l/span-4
-        x-cv
+        x-cv x-col
         pa-1">
         <p><%= text %></p>
+        <btn text="More"></btn>
       </div>
     </div>
   </div>
