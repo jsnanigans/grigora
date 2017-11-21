@@ -119,7 +119,7 @@ function peregrine (options) {
   const wasMinified = []
   // purify assets
   this.purify = () => {
-    if (options.env === 'development' || !this.compilation) {
+    if (options.env === 'development') {
       return
     }
 
@@ -145,36 +145,34 @@ function peregrine (options) {
 
           if (file.endsWith('.css')) {
             saveData.css[file] = asset.source()
-            assetsToPurify.push(asset)
+            assetsToPurify.push({ asset, file })
           }
         })
 
         fs.writeFileSync(jsAssetsTempFile, assetsToInclude)
         fs.writeFileSync(this.tempFile, JSON.stringify(saveData))
 
+        // console.log(this.pageList)
+
+        const sourceAssets = []
+        this.pageList.forEach(page => {
+          const name = this.tempDir + '/' + Math.random()
+          sourceAssets.push(name)
+          fs.writeFileSync(name, page.content, 'utf8')
+        })
+
         assetsToPurify.forEach(asset => {
-          const name = asset.name
+          const name = asset.file
 
           if (wasMinified.indexOf(name) !== -1) {
             return
           }
 
-          const componentTemplates = Object.keys(componentCache)
-            .map(key => key.split('++')[0])
-            .filter(file => fs.existsSync(file))
-
-          const otherTemplates = Object.keys(componentAssets)
-            .filter((v, i, a) => a.indexOf(v) === i)
-            .map(key => key)
-            .filter(file => fs.existsSync(file))
-
-          const sourceAssets = otherTemplates.concat(componentTemplates)
-
           sourceAssets.push(jsAssetsTempFile)
 
           const purified = purify(
             sourceAssets,
-            asset.source(),
+            asset.asset.source(),
             {
               minify: true
               // info: true
@@ -606,10 +604,10 @@ function peregrine (options) {
     })
   }
 
+  this.pageList = []
   this.generatePages = pagesGeneratedCallback => {
     const conf = this.config
     const options = conf.options || {}
-    const pageList = []
 
     const pages = Object.keys(conf.pages).map(pageKey => {
       const page = conf.pages[pageKey]
@@ -630,9 +628,9 @@ function peregrine (options) {
       this.generatePage(page, options, (file, content) => {
         pagesDone++
 
-        pageList.push({ file, content })
+        this.pageList.push({ file, content })
         if (pagesDone === pages.length) {
-          pagesGeneratedCallback(pageList)
+          pagesGeneratedCallback(this.pageList)
         }
       })
     })
