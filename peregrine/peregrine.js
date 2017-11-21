@@ -119,28 +119,38 @@ function peregrine (options) {
   const wasMinified = []
   // purify assets
   this.purify = () => {
-    if (options.env === 'development') {
+    if (options.env === 'development' || !this.compilation) {
       return
     }
 
     this.compilation.chunks.forEach(
       ({ name: chunkName }) => {
-        const allAssets = Object.keys(this.compilation.assets).map(o => {
-          const rt = this.compilation.assets[o]
-          rt.name = o
-          return rt
-        })
-
         const jsAssetsTempFile = path.join(this.tempDir, 'purify-js-assets.js')
+        const saveData = {
+          js: {},
+          css: {}
+        }
 
-        const assetsToPurify = allAssets.filter(o => o.name.endsWith('.css'))
-        let assetsToInclude = allAssets.filter(o => o.name.endsWith('.js'))
+        const assetsToPurify = []// = allAssets.filter(o => o.name.endsWith('.css'))
+        const assetsToInclude = []// = allAssets.filter(o => o.name.endsWith('.js'))
 
-        assetsToInclude = assetsToInclude.map(asset => {
-          return asset.children[0].source()
+        Object.keys(this.compilation.assets).forEach(file => {
+          const asset = this.compilation.assets[file]
+
+          if (file.endsWith('.js')) {
+            const source = asset.source()
+            saveData.js[file] = source
+            assetsToInclude.push(source)
+          }
+
+          if (file.endsWith('.css')) {
+            saveData.css[file] = asset.source()
+            assetsToPurify.push(asset)
+          }
         })
 
-        fs.writeFileSync(jsAssetsTempFile, assetsToInclude, 'utf8')
+        fs.writeFileSync(jsAssetsTempFile, assetsToInclude)
+        fs.writeFileSync(this.tempFile, JSON.stringify(saveData))
 
         assetsToPurify.forEach(asset => {
           const name = asset.name
@@ -273,22 +283,6 @@ function peregrine (options) {
       if (this.config.globalSeed) {
         globalSeed = this.config.globalSeed
         this.generateNavigations()
-
-        // const genNavs = {}
-        // this.config.pages.map(page => {
-        // if (page.navigation) {
-        //   if (!genNavs[page.navigation]) {
-        //     genNavs[page.navigation] = []
-        //   }
-
-        //   genNavs[page.navigation].push({
-        //     name: page.name,
-        //     slug: page.index ? '/' : '/' + page.route
-        //   })
-        // }
-        // })
-
-        // globalSeed.generatedNavigation = genNavs
       }
     }
   }
@@ -296,7 +290,6 @@ function peregrine (options) {
   this.generateNavigations = _ => {
     const navs = this.config.navigation
 
-    // if (!this.config.globalSeed) { this.config.globalSeed = {} }
     this.config.globalSeed.autoNav = {}
 
     const genTree = tree => {
@@ -354,8 +347,6 @@ function peregrine (options) {
           assets.css[file] = asset.source()
         }
       })
-
-      fs.writeFileSync(this.tempFile, JSON.stringify(assets))
     } else {
       if (fs.existsSync(this.tempFile)) {
         const tempFileContent = fs.readFileSync(this.tempFile)
@@ -397,7 +388,6 @@ function peregrine (options) {
           scripts.push(`<link rel="stylesheet" href="/${file}" media="none" onload="if(media!='all')media='all'">
           <noscript><link rel="stylesheet" href="/${file}"></noscript>`)
         }
-        // scripts.push('<link rel="stylesheet" href="/' + file + '" />')
       })
 
       html = html.replace('{{insert_styles}}', scripts.join(''))
@@ -411,7 +401,6 @@ function peregrine (options) {
     Object.keys(componentCache).forEach(key => {
       const date = componentCache[key][0]
       if (now - cacheAge < date) {
-        // delete componentCache[key]
       }
     })
   }
@@ -595,9 +584,6 @@ function peregrine (options) {
         distPath += pageOpts.route + '/'
       }
 
-      // this.purify()
-      // allHTML = insertAssets(allHTML)
-
       tidy(allHTML, {
         doctype: 'html5',
         indent: true
@@ -620,7 +606,7 @@ function peregrine (options) {
     })
   }
 
-  this.generatePages = done => {
+  this.generatePages = pagesGeneratedCallback => {
     const conf = this.config
     const options = conf.options || {}
     const pageList = []
@@ -646,7 +632,7 @@ function peregrine (options) {
 
         pageList.push({ file, content })
         if (pagesDone === pages.length) {
-          done(pageList)
+          pagesGeneratedCallback(pageList)
         }
       })
     })
