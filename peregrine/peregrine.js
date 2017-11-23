@@ -34,10 +34,14 @@ const fileCache = {}
 
 function peregrine (options) {
   this.configFile = options.config || false
+  this.distDir = path.join(__dirname, '../dist')
   this.tempDir = path.join(__dirname, '.peregrine-temp')
   this.tempFile = path.join(this.tempDir, 'data.json')
   this.config = {}
   this.relatedFiles = []
+  this.tmp = {
+    sourceScriptFile: path.join(this.tempDir, 'purify-js-assets.js')
+  }
 
   if (!fs.existsSync(this.tempDir)) {
     fs.mkdirSync(this.tempDir)
@@ -116,75 +120,81 @@ function peregrine (options) {
     return rt
   }
 
-  const wasMinified = []
   // purify assets
   this.purify = () => {
     if (options.env === 'development') {
       return
     }
+    this.tmp.hasPurifiedAssets = true
 
-    this.compilation.chunks.forEach(
-      ({ name: chunkName }) => {
-        const jsAssetsTempFile = path.join(this.tempDir, 'purify-js-assets.js')
-        const saveData = {
-          js: {},
-          css: {}
-        }
+    const wasMinified = []
+    // this.compilation.chunks.forEach(
+    //   ({ name: chunkName }) => {
+    const saveData = {
+      js: {},
+      css: {}
+    }
 
-        const assetsToPurify = []// = allAssets.filter(o => o.name.endsWith('.css'))
-        const assetsToInclude = []// = allAssets.filter(o => o.name.endsWith('.js'))
+    const assetsToPurify = []// = allAssets.filter(o => o.name.endsWith('.css'))
+    const assetsToInclude = []// = allAssets.filter(o => o.name.endsWith('.js'))
 
-        Object.keys(this.compilation.assets).forEach(file => {
-          const asset = this.compilation.assets[file]
+    Object.keys(this.compilation.assets).forEach(file => {
+      const asset = this.compilation.assets[file]
 
-          if (file.endsWith('.js')) {
-            const source = asset.source()
-            saveData.js[file] = source
-            assetsToInclude.push(source)
-          }
-
-          if (file.endsWith('.css')) {
-            saveData.css[file] = asset.source()
-            assetsToPurify.push({ asset, file })
-          }
-        })
-
-        fs.writeFileSync(jsAssetsTempFile, assetsToInclude)
-        fs.writeFileSync(this.tempFile, JSON.stringify(saveData))
-
-        // console.log(this.pageList)
-
-        const sourceAssets = []
-        this.pageList.forEach(page => {
-          const name = this.tempDir + '/' + Math.random()
-          sourceAssets.push(name)
-          fs.writeFileSync(name, page.content, 'utf8')
-        })
-
-        assetsToPurify.forEach(asset => {
-          const name = asset.file
-
-          if (wasMinified.indexOf(name) !== -1) {
-            return
-          }
-
-          sourceAssets.push(jsAssetsTempFile)
-
-          const purified = purify(
-            sourceAssets,
-            asset.asset.source(),
-            {
-              minify: true
-              // info: true
-            }
-          )
-
-          this.compilation.assets[name] = new WPS.ConcatSource(purified)
-
-          wasMinified.push(name)
-        })
+      if (file.endsWith('.js')) {
+        const source = asset.source()
+        saveData.js[file] = source
+        assetsToInclude.push(source)
       }
-    )
+
+      if (file.endsWith('.css')) {
+        saveData.css[file] = asset.source()
+        assetsToPurify.push({ asset, file })
+      }
+    })
+
+    fs.writeFileSync(this.tmp.sourceScriptFile, assetsToInclude.join('; '))
+    fs.writeFileSync(this.tempFile, JSON.stringify(saveData))
+
+    // console.log(this.pageList)
+
+    const sourceAssets = [this.tmp.sourceScriptFile]
+    this.tmp.pageSeed = []
+    this.pageList.forEach(page => {
+      const name = this.tempDir + '/' + 'purify-asset.' + page.file.replace(this.distDir, '').replace(/\//g, '')
+      sourceAssets.push(name)
+      this.tmp.pageSeed.push(name)
+      fs.writeFileSync(name, page.content, 'utf8')
+    })
+
+    assetsToPurify.forEach(asset => {
+      const name = asset.file
+
+      if (wasMinified.indexOf(name) !== -1) {
+        return
+      }
+
+      const purified = purify(
+        sourceAssets,
+        asset.asset.source(),
+        {
+          minify: true
+          // info: true
+        }
+      )
+
+      const newAssetName = name.split('.')[0] + '.purified.' + Date.now() + '.css'
+      this.compilation.assets[newAssetName] = new WPS.ConcatSource(purified)
+      wasMinified.push(name)
+    })
+
+    // tempFiles.forEach(file => {
+    //   fs.unlink(file, err => {
+    //     if (err) throw (err)
+    //   })
+    // })
+    //   }
+    // )
   }
 
   // resolve custom includes and replace with the tempalte
@@ -323,7 +333,9 @@ function peregrine (options) {
   this.prevTimestamps = {}
 
   let initialInsert = true
-  this.insertAssets = (html) => {
+  this.insertAssets = (page) => {
+    let html = page.content
+
     if (initialInsert) {
       initialInsert = false
     }
@@ -341,7 +353,7 @@ function peregrine (options) {
           assets.js[file] = asset.source()
         }
 
-        if (file.endsWith('.css')) {
+        if (this.tmp.hasPurifiedAssets ? file.indexOf('purified') !== -1 : true && file.endsWith('.css')) {
           assets.css[file] = asset.source()
         }
       })
@@ -359,11 +371,6 @@ function peregrine (options) {
 
       Object.keys(assets.js).forEach(file => {
         scripts.push('<script type="text/javascript" src="/' + file + '"></script>')
-
-        // if (file.indexOf('crit.') !== -1) {
-        //   scripts.push('<script type="text/javascript">' + assets.js[file] + '</script>')
-        // } else {
-        // }
       })
 
       html = html.replace('{{insert_scripts}}', scripts.join(''))
@@ -373,9 +380,16 @@ function peregrine (options) {
       const scripts = []
 
       Object.keys(assets.css).forEach(file => {
+        if (this.tmp.hasPurifiedAssets && file.indexOf('purified') === -1) {
+          return
+        }
         if (file.indexOf('crit.') !== -1) {
+          const tmpPage = this.tempDir + '/purify-asset.' + page.file.replace(this.distDir, '').replace(/\//g, '')
           const purified = purify(
-            html,
+            [
+              tmpPage,
+              this.tmp.sourceScriptFile
+            ],
             assets.css[file],
             {
               minify: true
@@ -680,7 +694,7 @@ peregrine.prototype.apply = function (compiler) {
         if (file === this.configFile || this.relatedFiles.indexOf(file) !== -1) {
           this.generatePages(pageList => {
             pageList.forEach(page => {
-              const html = this.insertAssets(page.content)
+              const html = this.insertAssets(page)
               fs.writeFileSync(page.file, html, 'utf8')
             })
 
@@ -706,7 +720,7 @@ peregrine.prototype.apply = function (compiler) {
         this.generatePages(pageList => {
           this.purify()
           pageList.forEach(page => {
-            const html = this.insertAssets(page.content)
+            const html = this.insertAssets(page)
             fs.writeFileSync(page.file, html, 'utf8')
           })
 
