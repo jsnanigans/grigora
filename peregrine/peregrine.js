@@ -182,7 +182,17 @@ function peregrine (options) {
 
       const purified = new PurgeCss({
         content: sourceAssets,
-        css: [purifyCssFile]
+        css: [purifyCssFile],
+        extractors: [
+          {
+            extractor: class {
+              static extract (content) {
+                return content.match(/[A-z0-9-:\/@]+/g) || []
+              }
+            },
+            extensions: ['html', 'js'] // file extensions
+          }
+        ]
       }).purge()
 
       const newAssetName = name.split('.')[0] + '.purified.' + Date.now() + '.css'
