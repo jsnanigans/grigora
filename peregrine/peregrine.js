@@ -6,11 +6,13 @@ const ejs = require('ejs')
 const rimraf = require('rimraf')
 const encrypt = require('crypto-js/md5')
 const tidy = require('htmltidy').tidy
-const purify = require('purifycss-extended')
+// const purify = require('purifycss-extended')
 const classGenerator = require('../src/02_styles/generators/_generate')
+const PurgeCss = require('purgecss')
 
 // lib includes
 const useTag = require('./lib/optionUseTag')
+// const purge = require('./lib/purgeCss')
 
 // variable definitions
 const logEnabled = false
@@ -120,8 +122,8 @@ function peregrine (options) {
     return rt
   }
 
-  // purify assets
-  this.purify = () => {
+  // purify/purge assets
+  this.purgeMain = () => {
     if (options.env === 'development') {
       return
     }
@@ -159,6 +161,8 @@ function peregrine (options) {
     // console.log(this.pageList)
 
     const sourceAssets = [this.tmp.sourceScriptFile]
+    // const sourceAssets = []
+    const purifyCssFile = this.tempDir + '/purify-asset.css'
     this.tmp.pageSeed = []
     this.pageList.forEach(page => {
       const name = this.tempDir + '/' + 'purify-asset.' + page.file.replace(this.distDir, '').replace(/\//g, '')
@@ -174,17 +178,15 @@ function peregrine (options) {
         return
       }
 
-      const purified = purify(
-        sourceAssets,
-        asset.asset.source(),
-        {
-          minify: true
-          // info: true
-        }
-      )
+      fs.writeFileSync(purifyCssFile, asset.asset.source(), 'utf8')
+
+      const purified = new PurgeCss({
+        content: sourceAssets,
+        css: [purifyCssFile]
+      }).purge()
 
       const newAssetName = name.split('.')[0] + '.purified.' + Date.now() + '.css'
-      this.compilation.assets[newAssetName] = new WPS.ConcatSource(purified)
+      this.compilation.assets[newAssetName] = new WPS.ConcatSource(purified[0].css)
       wasMinified.push(name)
     })
 
@@ -384,18 +386,18 @@ function peregrine (options) {
           return
         }
         if (file.indexOf('crit.') !== -1) {
-          const tmpPage = this.tempDir + '/purify-asset.' + page.file.replace(this.distDir, '').replace(/\//g, '')
-          const purified = purify(
-            [
-              tmpPage,
-              this.tmp.sourceScriptFile
-            ],
-            assets.css[file],
-            {
-              minify: true
-            }
-          )
-          scripts.push(`<style>${purified}</style>`)
+          // const tmpPage = this.tempDir + '/purify-asset.' + page.file.replace(this.distDir, '').replace(/\//g, '')
+          // const purified = purify(
+          //   [
+          //     tmpPage,
+          //     this.tmp.sourceScriptFile
+          //   ],
+          //   assets.css[file],
+          //   {
+          //     minify: true
+          //   }
+          // )
+          scripts.push(`<style>${assets.css[file]}</style>`)
         } else {
           scripts.push(`<link rel="stylesheet" href="/${file}" media="none" onload="if(media!='all')media='all'">
           <noscript><link rel="stylesheet" href="/${file}"></noscript>`)
@@ -718,7 +720,7 @@ peregrine.prototype.apply = function (compiler) {
 
         this.loadConfig()
         this.generatePages(pageList => {
-          this.purify()
+          this.purgeMain()
           pageList.forEach(page => {
             const html = this.insertAssets(page)
             fs.writeFileSync(page.file, html, 'utf8')
