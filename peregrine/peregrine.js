@@ -155,20 +155,24 @@ function peregrine (options) {
       }
     })
 
-    fs.writeFileSync(this.tmp.sourceScriptFile, assetsToInclude.join('; '))
-    fs.writeFileSync(this.tempFile, JSON.stringify(saveData))
+    fs.writeFile(this.tempFile, JSON.stringify(saveData), err => {
+      if (err) throw err
+    })
 
-    // console.log(this.pageList)
+    this.tmp.jsAssets = assetsToInclude.join('; ')
 
-    const sourceAssets = [this.tmp.sourceScriptFile]
-    // const sourceAssets = []
-    const purifyCssFile = this.tempDir + '/purify-asset.css'
+    const sourceAssets = [{
+      raw: assetsToInclude.join('; '),
+      extension: 'js'
+    }]
     this.tmp.pageSeed = []
     this.pageList.forEach(page => {
       const name = this.tempDir + '/' + 'purify-asset.' + page.file.replace(this.distDir, '').replace(/\//g, '')
-      sourceAssets.push(name)
+      sourceAssets.push({
+        raw: page.content,
+        extension: 'html'
+      })
       this.tmp.pageSeed.push(name)
-      fs.writeFileSync(name, page.content, 'utf8')
     })
 
     assetsToPurify.forEach(asset => {
@@ -178,11 +182,11 @@ function peregrine (options) {
         return
       }
 
-      fs.writeFileSync(purifyCssFile, asset.asset.source(), 'utf8')
+      // fs.writeFileSync(purifyCssFile, asset.asset.source(), 'utf8')
 
       const purified = new PurgeCss({
         content: sourceAssets,
-        css: [purifyCssFile],
+        css: [{ raw: asset.asset.source() }],
         extractors: [
           {
             extractor: class {
@@ -190,7 +194,7 @@ function peregrine (options) {
                 return content.match(/[A-z0-9-:\/@]+/g) || []
               }
             },
-            extensions: ['html', 'js'] // file extensions
+            extensions: ['html', 'js']
           }
         ]
       }).purge()
@@ -396,18 +400,33 @@ function peregrine (options) {
           return
         }
         if (file.indexOf('crit.') !== -1) {
-          // const tmpPage = this.tempDir + '/purify-asset.' + page.file.replace(this.distDir, '').replace(/\//g, '')
-          // const purified = purify(
-          //   [
-          //     tmpPage,
-          //     this.tmp.sourceScriptFile
-          //   ],
-          //   assets.css[file],
-          //   {
-          //     minify: true
-          //   }
-          // )
-          scripts.push(`<style>${assets.css[file]}</style>`)
+          const purifyCntent = [
+            {
+              raw: html,
+              extension: 'html'
+            },
+            {
+              raw: this.tmp.jsAssets,
+              extension: 'js'
+            }
+          ]
+
+          const purified = new PurgeCss({
+            content: purifyCntent,
+            css: [{ raw: assets.css[file] }],
+            extractors: [
+              {
+                extractor: class {
+                  static extract (content) {
+                    return content.match(/[A-z0-9-:\/@]+/g) || []
+                  }
+                },
+                extensions: ['html', 'js']
+              }
+            ]
+          }).purge()
+
+          scripts.push(`<style>${purified[0].css}</style>`)
         } else {
           scripts.push(`<link rel="stylesheet" href="/${file}" media="none" onload="if(media!='all')media='all'">
           <noscript><link rel="stylesheet" href="/${file}"></noscript>`)
