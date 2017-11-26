@@ -350,7 +350,13 @@ function peregrine (options) {
 
   let initialInsert = true
   this.insertAssets = (page) => {
-    let html = page.content
+    let html
+
+    if (typeof page === 'string') {
+      html = page
+    } else {
+      html = page.content
+    }
 
     if (initialInsert) {
       initialInsert = false
@@ -377,6 +383,13 @@ function peregrine (options) {
       if (fs.existsSync(this.tempFile)) {
         const tempFileContent = fs.readFileSync(this.tempFile)
         assets = JSON.parse(tempFileContent)
+
+        const jsAssets = []
+        Object.keys(assets.js).forEach(key => {
+          const asset = assets.js[key]
+          jsAssets.push(asset)
+        })
+        this.tmp.jsAssets = jsAssets.join('; ')
       } else {
         console.log('Temp file not found: ' + this.tempFile + ' \n |- Run "yarn build" to create it')
       }
