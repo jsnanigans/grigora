@@ -160,8 +160,6 @@ function peregrine (options) {
         return
       }
 
-      // fs.writeFileSync(purifyCssFile, asset.asset.source(), 'utf8')
-
       const purified = new PurgeCss({
         content: sourceAssets,
         css: [{ raw: asset.asset.source() }],
@@ -402,22 +400,27 @@ function peregrine (options) {
             }
           ]
 
-          const purified = new PurgeCss({
-            content: purifyCntent,
-            css: [{ raw: assets.css[file] }],
-            extractors: [
-              {
-                extractor: class {
-                  static extract (content) {
-                    return content.match(/[A-z0-9-:\/@]+/g) || []
-                  }
-                },
-                extensions: ['html', 'js']
-              }
-            ]
-          }).purge()
+          let purified
+          if (options.env === 'production') {
+            purified = new PurgeCss({
+              content: purifyCntent,
+              css: [{ raw: assets.css[file] }],
+              extractors: [
+                {
+                  extractor: class {
+                    static extract (content) {
+                      return content.match(/[A-z0-9-:\/@]+/g) || []
+                    }
+                  },
+                  extensions: ['html', 'js']
+                }
+              ]
+            }).purge()[0].css
+          } else {
+            purified = assets.css[file]
+          }
 
-          scripts.push(`<style>${purified[0].css}</style>`)
+          scripts.push(`<style>${purified}</style>`)
         } else {
           scripts.push(`<link rel="stylesheet" href="/${file}" media="none" onload="if(media!='all')media='all'">
           <noscript><link rel="stylesheet" href="/${file}"></noscript>`)
