@@ -15,7 +15,7 @@ const useTag = require('./lib/optionUseTag')
 // const purge = require('./lib/purgeCss')
 
 // variable definitions
-const logEnabled = false
+// const logEnabled = false
 let showErrors = false
 
 if (process.env.NODE_ENV === 'development') {
@@ -47,28 +47,6 @@ function peregrine (options) {
 
   if (!fs.existsSync(this.tempDir)) {
     fs.mkdirSync(this.tempDir)
-  }
-
-  this.log = {
-    log: '',
-    clear: _ => {
-      this.log = ''
-    },
-    add: t => {
-      if (typeof this.log !== 'string') {
-        this.log = ''
-      }
-      this.log += t + '\n'
-    },
-    print: _ => {
-      setTimeout(_ => {
-        if (logEnabled) {
-          console.log('=======')
-          console.log(this.log)
-          console.log('=======')
-        }
-      }, 200)
-    }
   }
 
   this.dropCache = (name) => {
@@ -649,9 +627,10 @@ function peregrine (options) {
           return
         }
         const writeFile = distPath + 'index.' + fileExtension
-        // fs.writeFile(writeFile, html, 'utf8', _ => {})
         pageDone(writeFile, html)
       })
+      // const writeFile = distPath + 'index.' + fileExtension
+      // pageDone(writeFile, allHTML)
     })
   }
 
@@ -663,9 +642,14 @@ function peregrine (options) {
   }
 
   this.pageList = []
-  this.generatePages = pagesGeneratedCallback => {
+  this.generatePages = (targetPageRegex, pagesGeneratedCallback) => {
     const conf = this.config
     const options = conf.options || {}
+
+    if (typeof targetPageRegex === 'function') {
+      pagesGeneratedCallback = targetPageRegex
+      targetPageRegex = /.*/i
+    }
 
     const pages = Object.keys(conf.pages).map(pageKey => {
       const page = conf.pages[pageKey]
@@ -679,7 +663,7 @@ function peregrine (options) {
       }
 
       return page
-    })
+    }).filter(page => targetPageRegex.test(page.key) || targetPageRegex.test(page.name))
 
     let pagesDone = 0
     pages.forEach(page => {
