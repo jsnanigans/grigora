@@ -663,9 +663,14 @@ function peregrine (options) {
   }
 
   this.pageList = []
-  this.generatePages = pagesGeneratedCallback => {
+  this.generatePages = (targetPageRegex, pagesGeneratedCallback) => {
     const conf = this.config
     const options = conf.options || {}
+
+    if (typeof targetPageRegex === 'function') {
+      pagesGeneratedCallback = targetPageRegex
+      targetPageRegex = /.*/i
+    }
 
     const pages = Object.keys(conf.pages).map(pageKey => {
       const page = conf.pages[pageKey]
@@ -679,7 +684,7 @@ function peregrine (options) {
       }
 
       return page
-    })
+    }).filter(page => targetPageRegex.test(page.key) || targetPageRegex.test(page.name))
 
     let pagesDone = 0
     pages.forEach(page => {
