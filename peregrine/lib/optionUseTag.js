@@ -10,37 +10,25 @@ const printErr = (err, data = '') => {
 const fileType = 'ejs'
 
 const createPath = pathArray => {
-  const assetPath = []
+  const assetPath = ['components']
   const arr = [...pathArray]
 
   // if there is no teplate defined, use default
-  if (arr.length === 2) {
+  if (arr.length === 1) {
     arr.push('default')
   }
 
-  if (arr.length !== 3) {
-    return printErr('ERR: Path is incorrect, must be 2 or three sections long', pathArray)
+  if (arr.length !== 2) {
+    return printErr('ERR: Path is incorrect, must be 1 or 2 sections long', pathArray)
   }
 
-  // 0 = part or layout
-  if (arr[0] === 'part' || arr[0] === 'layout') {
-    if (arr[0] === 'part') {
-      assetPath.push('03_parts')
-    }
-    if (arr[0] === 'layout') {
-      assetPath.push('04_layouts')
-    }
-  } else {
-    return printErr('Firt section must be either "part" or "layout"')
-  }
-
-  // 1 = name
+  // 0 = name
   // todo: check if it exists
-  assetPath.push(arr[1])
+  assetPath.push(arr[0])
 
-  // 2 = tempalte file
+  // 1 = tempalte file
   // todo: check if it exists
-  assetPath.push(arr[2] + '.' + fileType)
+  assetPath.push(arr[1] + '.' + fileType)
 
   // return path.join('/')
   return path.join(__dirname, '../../src/', assetPath.join('/'))

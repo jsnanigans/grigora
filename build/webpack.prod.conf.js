@@ -75,7 +75,7 @@ var webpackConfig = merge(baseWebpackConfig, {
             {
               loader: 'stylus-vars-loader',
               options: {
-                file: './src/01_variables/index.styl',
+                file: './src/styles/variables/index.styl',
               }
             }
           ]

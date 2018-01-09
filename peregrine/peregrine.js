@@ -7,7 +7,7 @@ const rimraf = require('rimraf')
 const encrypt = require('crypto-js/md5')
 const tidy = require('htmltidy').tidy
 // const purify = require('purifycss-extended')
-const classGenerator = require('../src/02_styles/generators/_generate')
+const classGenerator = require('../src/styles/generators/_generate')
 const PurgeCss = require('purgecss')
 
 // lib includes
@@ -22,7 +22,7 @@ if (process.env.NODE_ENV === 'development') {
   showErrors = true
 }
 
-const componentsPath = './src/05_components/'
+const componentsPath = './src/components/'
 const fileExtension = '.ejs'
 let globalSeed = {}
 
@@ -80,7 +80,7 @@ function peregrine (options) {
     options.setPaths(usedTemplates)
   }
 
-  const includeOptions = /\{\{(define)+((.|\n)*?)\}\}/g
+  const includeOptions = /\{\{(components)+((.|\n)*?)\}\}/g
 
   this.parseAssetPath = assetPath => {
     const basePath = path.join(__dirname, '../src')
@@ -529,8 +529,8 @@ function peregrine (options) {
             let compHTML = ''
             // Comment before
             compHTML = '<!-- Component START: "' + comp.name + '"' +
-              ' Template: ' + comp.srcFile.split('05_components/')[1] + '' +
-              ' Seed: ' + comp.seedFile.split('05_components/')[1] + '' +
+              ' Template: ' + comp.srcFile.split('components/')[1] + '' +
+              ' Seed: ' + comp.seedFile.split('components/')[1] + '' +
                ' -->\n'
             // Add rendered string
             compHTML += rendered

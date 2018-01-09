@@ -6,7 +6,7 @@ const sourceFiles = [
   path.join(__dirname, 'grid.styl'),
   path.join(__dirname, 'positioning.styl'),
   path.join(__dirname, 'spacing.styl'),
-  path.join(__dirname, '../../01_variables/layout.styl')
+  path.join(__dirname, '../../styles/variables/layout.styl')
 ]
 
 const outFile = path.join(__dirname, '_generated.css')
@@ -36,7 +36,7 @@ const determinUpdateRequired = _ => {
 
 const generateFile = _ => {
   const genPath = path.join(__dirname, '_gen')
-  const varPath = path.join(__dirname, '../../01_variables/index')
+  const varPath = path.join(__dirname, '../../styles/variables/index')
   stylus(`@import '${varPath}' \n @import '${genPath}'`)
     .use(require('rupture')())
     .use(require('jeet')())

@@ -4217,9 +4217,18 @@ punycode@^1.2.4, punycode@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
 
+purgecss@^0.13.1:
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/purgecss/-/purgecss-0.13.1.tgz#3f25da14ad35ef9d3f9a1a730269be97af01e954"
+  dependencies:
+    glob "^7.1.2"
+    postcss "^6.0.14"
+    postcss-selector-parser "^3.1.1"
+    yargs "^10.0.3"
+
 purgecss@jsnanigans/purgecss:
   version "0.13.0"
-  resolved "https://codeload.github.com/jsnanigans/purgecss/tar.gz/6536e3723e35e2a3a8f882bdfd78823ce27ce66d"
+  resolved "https://codeload.github.com/jsnanigans/purgecss/tar.gz/b841d5236ed01b9516cab5609f584c3e717e61bd"
   dependencies:
     glob "^7.1.2"
     postcss "^6.0.14"

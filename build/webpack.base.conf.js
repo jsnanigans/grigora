@@ -22,11 +22,9 @@ module.exports = {
     extensions: ['.js', '.ejs', '.json', '.styl'],
     alias: {
       '@': resolve('src'),
-      'variables': resolve('src/01_variables'),
-      'styles': resolve('src/02_styles'),
-      'parts': resolve('src/03_parts'),
-      'layouts': resolve('src/04_layouts'),
-      'components': resolve('src/05_components'),
+      'variables': resolve('src/styles/variables'),
+      'styles': resolve('src/styles'),
+      'components': resolve('src/components'),
     }
   },
   module: {

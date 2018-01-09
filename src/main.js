@@ -1,8 +1,6 @@
 // require('./main.styl')
 
-// layouts included
-require('layouts/demo_form')
-
 // components included
+require('components/demo_form')
 require('components/image')
 require('components/demos')
