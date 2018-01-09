@@ -1,5 +1,5 @@
-require('./generators/_generated.css')
-// require('./generators/_gen')
+// require('./generators/_generated.css')
+require('./generators/_gen')
 
 require('./reset')
 require('./base')
