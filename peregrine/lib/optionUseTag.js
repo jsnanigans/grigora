@@ -26,6 +26,8 @@ const createPath = pathArray => {
   // todo: check if it exists
   assetPath.push(arr[0])
 
+  assetPath.push('templates')
+
   // 1 = tempalte file
   // todo: check if it exists
   assetPath.push(arr[1] + '.' + fileType)
