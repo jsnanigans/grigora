@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "babel-minify-webpack-plugin": "^0.2.0",
-    "crypto-js": "^3.1.9-1",
+    "crypto-js": "^3.2.1",
     "ect": "^0.5.9",
     "ejs": "^2.5.7",
     "ejs2-loader": "^1.0.0",
